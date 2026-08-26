@@ -20,6 +20,10 @@
     <div class="col-auto text-muted small">
         Il periodo si applica a presenze, utilizzo cavalli e occupazione istruttori/campi.
     </div>
+    <div class="col-auto ms-auto d-flex gap-2">
+        <a href="{% url 'report:report_csv' %}?dal={{ dal|date:'Y-m-d' }}&al={{ al|date:'Y-m-d' }}" class="btn btn-sm btn-outline-secondary">Esporta CSV</a>
+        <a href="{% url 'report:report_pdf' %}?dal={{ dal|date:'Y-m-d' }}&al={{ al|date:'Y-m-d' }}" class="btn btn-sm btn-outline-secondary">Esporta PDF</a>
+    </div>
 </form>
 
 <div class="row g-4 mb-4">

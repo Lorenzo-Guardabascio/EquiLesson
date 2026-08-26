@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Q
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -9,6 +10,8 @@ from cavalli.models import ScadenzaSanitaria
 from lezioni.models import Lezione, Partecipazione
 from pacchetti.models import Pacchetto
 from persone.models import Allievo
+
+from .export import genera_csv, genera_pdf
 
 GIORNI_PREAVVISO_SCADENZE = 30
 
@@ -126,12 +129,12 @@ def _cavalli_in_scadenza(oggi):
     return voci
 
 
-@staff_member_required
-def report(request):
+def _raccogli_dati(request):
+    """Tutte le sezioni del report per il periodo richiesto: usata sia dalla
+    pagina a schermo sia dagli export, per non ricalcolare la logica due volte."""
     dal, al = _periodo(request)
     oggi = timezone.localdate()
-
-    return render(request, "report/report.html", {
+    return {
         "dal": dal,
         "al": al,
         "presenze": _presenze_per_allievo(dal, al),
@@ -140,4 +143,27 @@ def report(request):
         "occupazione_campi": _occupazione_campi(dal, al),
         "scadenze": _allievi_in_scadenza(oggi),
         "scadenze_cavalli": _cavalli_in_scadenza(oggi),
-    })
+    }
+
+
+@staff_member_required
+def report(request):
+    return render(request, "report/report.html", _raccogli_dati(request))
+
+
+@staff_member_required
+def report_csv(request):
+    dati = _raccogli_dati(request)
+    nome_file = f"report_equilesson_{dati['dal']:%Y%m%d}_{dati['al']:%Y%m%d}.csv"
+    response = HttpResponse(genera_csv(dati), content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="{nome_file}"'
+    return response
+
+
+@staff_member_required
+def report_pdf(request):
+    dati = _raccogli_dati(request)
+    nome_file = f"report_equilesson_{dati['dal']:%Y%m%d}_{dati['al']:%Y%m%d}.pdf"
+    response = HttpResponse(genera_pdf(dati), content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="{nome_file}"'
+    return response
