@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Calendario lezioni{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Calendario lezioni</h1>
+    <a href="{% url 'admin:lezioni_lezione_add' %}" class="btn btn-primary btn-sm">+ Nuova lezione</a>
+</div>
+
+<div class="d-flex gap-3 small text-muted mb-3">
+    <span><span class="badge" style="background:#6c757d">&nbsp;</span> Prenotata</span>
+    <span><span class="badge" style="background:#0d6efd">&nbsp;</span> Confermata</span>
+    <span><span class="badge" style="background:#198754">&nbsp;</span> Svolta</span>
+    <span><span class="badge" style="background:#dc3545">&nbsp;</span> Annullata</span>
+</div>
+
+<div id="calendario" class="bg-white rounded shadow-sm p-2"></div>
+
+<script src="{% static 'vendor/fullcalendar/index.global.min.js' %}"></script>
+<script src="{% static 'vendor/fullcalendar/it.global.min.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendario');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'it',
+        firstDay: 1,
+        height: 'auto',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        initialView: 'timeGridWeek',
+        slotMinTime: '08:00:00',
+        slotMaxTime: '20:00:00',
+        allDaySlot: false,
+        events: "{% url 'lezioni:eventi_json' %}",
+        eventDidMount: function (info) {
+            var props = info.event.extendedProps;
+            var titolo = info.event.title;
+            if (props.campo) titolo += '\nCampo: ' + props.campo;
+            if (props.istruttore) titolo += '\nIstruttore: ' + props.istruttore;
+            titolo += '\nStato: ' + props.stato;
+            info.el.setAttribute('title', titolo);
+        }
+    });
+    calendar.render();
+});
+</script>
+{% endblock %}
