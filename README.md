@@ -1,6 +1,200 @@
-🇮🇹 Italiano · [🇬🇧 English](README.en.md)
+**English** (below) · [**Italiano** ↓](#equilesson-italiano)
 
 # EquiLesson
+
+Open source management software for equestrian centers: students, horses,
+lessons, lesson packages and communications. Started as an internal project
+for a real riding school, built to be maintained by one person rather than
+a dedicated team: mainstream stack, few moving parts, no separate build
+pipeline.
+
+## Stack
+
+- Python 3.10 + Django 5.2
+- PostgreSQL
+- Bootstrap 5 and FullCalendar, self-hosted under `static/vendor/` (no external CDN)
+- No JS/SPA framework: Django templates plus a bit of JS for the calendar
+  and the lesson formset
+
+## Development setup
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # then fill in at least DB_NAME/DB_USER/DB_PASSWORD
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
+```
+
+Development note: when a `templates/` folder is created for an app for the
+first time, an already-running `runserver` process won't notice (the list of
+template directories is cached at startup). In that case you need a clean
+restart of the process — plain autoreload isn't enough.
+
+## Management commands
+
+- `python manage.py carica_dati_demo` — loads placeholder data (students,
+  horses, instructors, arenas, lessons...). Safe to run again without
+  duplicating data.
+- `python manage.py imposta_ruoli` — creates/updates the Instructors/Students
+  groups and creates missing login accounts (instructors get limited admin
+  access, students get access to the read-only portal only). Generated
+  passwords are printed once and never saved anywhere: pass them on right
+  away, they can't be recovered later.
+- `python manage.py invia_notifiche` — sends lesson reminders (the day
+  before) and expiry alerts (medical certificate, federation membership
+  cards, lesson package) within 30 days. Meant to run once a day via cron:
+
+  ```cron
+  0 8 * * * /path/venv/bin/python /path/manage.py invia_notifiche >> /path/logs/notifiche.log 2>&1
+  ```
+
+  Safe to run more than once: it won't send the same alert twice (uses
+  `comunicazioni.NotificaInviata` as a deduplication log).
+- `python manage.py telegram_poll` — reads incoming Telegram messages and
+  links student accounts that send `/link <code>` from the portal. Meant to
+  run every 1-2 minutes via cron; a no-op if `TELEGRAM_BOT_TOKEN` isn't set.
+
+## Email
+
+By default (`.env` with no `EMAIL_BACKEND`) emails are only printed to the
+server console: convenient in development, no SMTP account needed to try out
+reminders/alerts/broadcasts. In production, set in `.env`:
+
+```
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=...
+EMAIL_HOST_USER=...
+EMAIL_HOST_PASSWORD=...
+DEFAULT_FROM_EMAIL=...
+```
+
+## Telegram and WhatsApp notifications
+
+Both are optional, additive channels on top of email, each with its own
+on/off switch in `/admin/core/impostazioni/` (both off by default):
+
+- **Telegram** is fully implemented: create a bot with
+  [@BotFather](https://t.me/BotFather), put the token in `TELEGRAM_BOT_TOKEN`
+  in `.env`, enable it in Impostazioni, and schedule `telegram_poll` in cron.
+  Students link their account themselves from the portal (no webhook needed
+  — the server doesn't need a public IP, it polls Telegram instead).
+- **WhatsApp** is scaffolded against the Meta WhatsApp Business Cloud API
+  (`WHATSAPP_ACCESS_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` in `.env`) but has
+  never been exercised against a real account — it requires your own
+  verified Meta Business setup, which this project can't provide. Review
+  `comunicazioni/canali/whatsapp.py` before relying on it.
+
+## Roles and access
+
+- **Admin/front desk** (superuser): full access, including `/admin/`.
+- **Instructors** ("Instructors" group, `is_staff=True`): full management of
+  lessons/participations, read-only on students/horses/arenas/packages, no
+  access to restricted documents (certificates, sensitive data).
+- **Students/parents** ("Students" group, `is_staff=False`): no admin
+  access, a portal at `/persone/portale/` with their own lessons and
+  package status. If the administrator turns on "Self-booking" (in
+  `/admin/core/impostazioni/`, **off by default**), they can also
+  book/cancel their own participation in lessons with open spots — the
+  horse is still assigned by the front desk.
+
+## Apps
+
+| App | Responsibility |
+|---|---|
+| `core` | home page, login/logout, site frame, global settings |
+| `persone` | students, guardians, instructors, horse owners, documents, student portal |
+| `cavalli` | horse records (school horses / boarders) |
+| `lezioni` | arenas, lesson types, calendar, lesson/participation form, self-booking |
+| `pacchetti` | configurable package types, purchased packages |
+| `comunicazioni` | reminders/alerts (email, Telegram, WhatsApp), broadcasts |
+| `report` | attendance, horse usage, instructor/arena occupancy, expiries |
+
+## Out of scope (deliberately)
+
+- Payments/invoicing: no revenue is tracked anywhere in the system
+  (packages only carry an informational reference price).
+- Automatic lesson waitlist: at the scale of a typical riding school it's
+  handled faster by a phone call than it would be worth building and
+  maintaining.
+- Tracking a student's technical level/progression: EquiLesson only records
+  what a student is aiming for (jumping, dressage, trail riding...), not a
+  skill assessment.
+- Rigid cancellation-notice rules: left to the front desk's judgement, the
+  system doesn't enforce them.
+- A centralized multi-tenant platform: every installation is independent
+  (see "Adopting it for your own riding school").
+
+## Roadmap
+
+**MVP (complete):**
+
+1. ~~Roles and permissions~~ ✅
+2. ~~Lesson calendar~~ ✅
+3. ~~Student/parent portal~~ ✅
+4. ~~Notifications/communications~~ ✅
+5. ~~Reports~~ ✅
+
+**Phase 2 (in progress), prompted by a look at other software in the field:**
+
+- [x] Self-booking for students, toggleable by the admin
+- [x] Telegram notifications (WhatsApp scaffolded, unverified)
+- [ ] Structured health-due-dates for horses (vaccinations, farrier visits,
+      deworming) with automatic reminders
+- [ ] CSV/PDF export for reports
+- [ ] Read-only portal for boarding-horse owners
+- [ ] Privacy/liability consent with tracked acceptance (a timestamp, not
+      just a checkbox)
+- [ ] Digital membership card with QR code for students
+- [ ] Bilingual Italian/English interface (the app itself, not just this file)
+
+Possible future extensions (not blocking): a dedicated visual design pass,
+competitions/events management, horse feeding plans, tack room inventory,
+a mobile app, tablet check-in, invoicing, a public website for the center.
+
+## Adopting it for your own riding school
+
+The distribution model is **one independent installation per center** (no
+multi-tenancy, no data from multiple riding schools in the same database):
+every facility gets its own copy, configurable in its lesson types, package
+sizes, arenas, and so on. You can clone the repo and install it yourself
+following "Development setup" above (production additionally needs a
+dedicated Postgres database and a reverse proxy with HTTPS in front of
+Django — not yet documented in detail in this repo).
+
+**Like the project?** The code stays free under AGPL-3.0: you can download
+it and run it yourself without owing me anything. If you'd rather not deal
+with it yourself — installation on your own server, customization for your
+center, migrating existing data, ongoing support — that's a paid service:
+open an issue or write to dragonknigth09@gmail.com. The project stays free,
+my time doesn't.
+
+## License
+
+Distributed under [GNU AGPL-3.0](LICENSE). In short: you may use, modify and
+redistribute the code freely, including for commercial purposes, but if you
+use it to run a service reachable over a network (even just for a single
+riding school, not necessarily for sale) you must make the complete source
+code — including your modifications — available to whoever uses that
+service. No such condition applies to purely internal use that isn't
+exposed to others over a network.
+
+## Security
+
+The system handles sensitive data (medical certificates, data belonging to
+minors). To responsibly report a vulnerability, see [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+Contributions, bug reports and proposals are welcome: see
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+[**English** ↑](#equilesson) · **Italiano** (sotto)
+
+# EquiLesson (Italiano)
 
 Gestionale open source per centri ippici: allievi, cavalli, lezioni,
 pacchetti e comunicazioni. Nasce come progetto interno per un maneggio reale,
@@ -51,6 +245,10 @@ serve un riavvio pulito del processo, non basta l'autoreload.
 
   È sicuro rilanciarlo più volte: non manda due volte lo stesso avviso (usa
   `comunicazioni.NotificaInviata` come registro di deduplica).
+- `python manage.py telegram_poll` — legge i messaggi Telegram in arrivo e
+  collega gli account allievo che inviano `/link <codice>` dal portale.
+  Pensato per girare ogni 1-2 minuti da cron; non fa nulla se
+  `TELEGRAM_BOT_TOKEN` non è configurato.
 
 ## Email
 
@@ -65,6 +263,24 @@ EMAIL_HOST_USER=...
 EMAIL_HOST_PASSWORD=...
 DEFAULT_FROM_EMAIL=...
 ```
+
+## Notifiche Telegram e WhatsApp
+
+Entrambi sono canali opzionali e aggiuntivi rispetto all'email, ciascuno con
+il proprio interruttore in `/admin/core/impostazioni/` (entrambi disattivati
+di default):
+
+- **Telegram** è pienamente funzionante: crea un bot con
+  [@BotFather](https://t.me/BotFather), metti il token in
+  `TELEGRAM_BOT_TOKEN` nel `.env`, attivalo in Impostazioni e programma
+  `telegram_poll` da cron. Gli allievi collegano l'account da soli dal
+  portale (nessun webhook necessario — il server non ha bisogno di un IP
+  pubblico, interroga lui Telegram periodicamente).
+- **WhatsApp** è predisposto per la Meta WhatsApp Business Cloud API
+  (`WHATSAPP_ACCESS_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` nel `.env`) ma non è
+  mai stato provato contro un account reale — richiede un account Meta
+  Business verificato che questo progetto non può fornire. Rivedi
+  `comunicazioni/canali/whatsapp.py` prima di farci affidamento.
 
 ## Ruoli e accesso
 
@@ -83,12 +299,12 @@ DEFAULT_FROM_EMAIL=...
 
 | App | Responsabilità |
 |---|---|
-| `core` | home page, login/logout, cornice del sito |
+| `core` | home page, login/logout, cornice del sito, impostazioni globali |
 | `persone` | allievi, tutori, istruttori, proprietari, documenti, portale allievi |
 | `cavalli` | anagrafica cavalli (scuola/pensione) |
-| `lezioni` | campi, tipi lezione, calendario, form lezione/partecipazioni |
+| `lezioni` | campi, tipi lezione, calendario, form lezione/partecipazioni, prenotazione autonoma |
 | `pacchetti` | tipi di pacchetto configurabili, pacchetti acquistati |
-| `comunicazioni` | promemoria/alert automatici, broadcast (via admin) |
+| `comunicazioni` | promemoria/alert (email, Telegram, WhatsApp), broadcast |
 | `report` | presenze/assenze, utilizzo cavalli, occupazione istruttori/campi, scadenze |
 
 ## Fuori scope (deciso esplicitamente)
@@ -119,13 +335,13 @@ DEFAULT_FROM_EMAIL=...
 **Fase 2 (in corso), nata da un confronto con altri gestionali del settore:**
 
 - [x] Prenotazione autonoma allievi, attivabile/disattivabile dall'admin
-- [ ] Notifiche via Telegram e WhatsApp, oltre all'email
+- [x] Notifiche Telegram (WhatsApp predisposto, non verificato)
 - [ ] Scadenze sanitarie strutturate per i cavalli (vaccinazioni, ferrature, sverminazioni) con promemoria automatico
 - [ ] Export dei report in CSV/PDF
 - [ ] Portale di sola lettura per i proprietari di cavalli in pensione
 - [ ] Consenso privacy/liberatoria con tracciamento di accettazione (data, non solo una checkbox)
 - [ ] Tessera digitale con QR per gli allievi
-- [ ] Interfaccia bilingue italiano/inglese
+- [ ] Interfaccia bilingue italiano/inglese (dell'app stessa, non solo di questo file)
 
 Estensioni future possibili (non bloccanti): rifinitura estetica dedicata,
 gestione gare/eventi, piano alimentare cavallo, magazzino/tack room, app
