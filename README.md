@@ -2,8 +2,8 @@
 
 Gestionale su misura per la gestione di allievi, cavalli, lezioni, pacchetti e
 comunicazioni di un centro ippico. Pensato per essere mantenuto da una sola
-persona, non da un team dedicato: stack
-mainstream, poche parti in movimento, nessuna pipeline di build separata.
+persona, non da un team dedicato: stack mainstream, poche parti in
+movimento, nessuna pipeline di build separata.
 
 ## Stack
 
