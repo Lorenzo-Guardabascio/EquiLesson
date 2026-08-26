@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'pacchetti',
     'lezioni',
     'comunicazioni',
+    'report',
 ]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'

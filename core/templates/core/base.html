@@ -24,6 +24,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}">Home</a></li>
                     {% if user.is_staff %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'lezioni:calendario' %}">Calendario</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'report:report' %}">Report</a></li>
                     <li class="nav-item"><a class="nav-link" href="/admin/">Amministrazione</a></li>
                     {% elif user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'persone:portale' %}">Le mie lezioni</a></li>

@@ -1,0 +1,136 @@
+{% extends "core/base.html" %}
+
+{% block title %}Report - Gestionale maneggio{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Report</h1>
+
+<form method="get" class="row g-2 align-items-end mb-4">
+    <div class="col-auto">
+        <label class="form-label small mb-0">Dal</label>
+        <input type="date" name="dal" value="{{ dal|date:'Y-m-d' }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-auto">
+        <label class="form-label small mb-0">Al</label>
+        <input type="date" name="al" value="{{ al|date:'Y-m-d' }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-sm btn-primary">Applica</button>
+    </div>
+    <div class="col-auto text-muted small">
+        Il periodo si applica a presenze, utilizzo cavalli e occupazione istruttori/campi.
+    </div>
+</form>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Presenze/assenze per allievo</h2>
+                <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>Allievo</th><th class="text-end">Svolte</th><th class="text-end">Assenti</th><th class="text-end">%</th></tr></thead>
+                    <tbody>
+                        {% for r in presenze %}
+                        <tr>
+                            <td>{{ r.allievo__nome }} {{ r.allievo__cognome }}</td>
+                            <td class="text-end">{{ r.svolte }}</td>
+                            <td class="text-end">{{ r.assenti }}</td>
+                            <td class="text-end">{% if r.percentuale is not None %}{{ r.percentuale }}%{% else %}—{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted">Nessuna partecipazione nel periodo.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Utilizzo cavalli</h2>
+                <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>Cavallo</th><th class="text-end">Lezioni</th></tr></thead>
+                    <tbody>
+                        {% for r in utilizzo_cavalli %}
+                        <tr><td>{{ r.cavallo__nome }}</td><td class="text-end">{{ r.numero_lezioni }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted">Nessun utilizzo nel periodo.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Occupazione istruttori</h2>
+                <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>Istruttore</th><th class="text-end">Lezioni</th></tr></thead>
+                    <tbody>
+                        {% for r in occupazione_istruttori %}
+                        <tr><td>{{ r.istruttore__nome }} {{ r.istruttore__cognome }}</td><td class="text-end">{{ r.numero_lezioni }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted">Nessuna lezione nel periodo.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Occupazione campi</h2>
+                <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>Campo</th><th class="text-end">Lezioni</th></tr></thead>
+                    <tbody>
+                        {% for r in occupazione_campi %}
+                        <tr><td>{{ r.campo__nome }}</td><td class="text-end">{{ r.numero_lezioni }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted">Nessuna lezione nel periodo.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 card-title">Allievi in scadenza (prossimi 30 giorni)</h2>
+        <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead><tr><th>Allievo</th><th>Tipo</th><th>Scadenza</th><th></th></tr></thead>
+            <tbody>
+                {% for v in scadenze %}
+                <tr>
+                    <td>{{ v.allievo }}</td>
+                    <td>{{ v.tipo }}</td>
+                    <td>{{ v.scadenza|date:"d/m/Y" }}</td>
+                    <td>{% if v.scaduto %}<span class="badge text-bg-danger">Scaduto</span>{% else %}<span class="badge text-bg-warning">In scadenza</span>{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-muted">Nessuna scadenza nei prossimi 30 giorni.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
