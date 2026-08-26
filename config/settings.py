@@ -165,3 +165,19 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'gestionale@maneggio.local')
+
+
+# Canali di messaggistica aggiuntivi (opzionali, oltre all'email).
+# Vanno anche abilitati dall'admin in Impostazioni: la presenza delle
+# credenziali qui non basta da sola ad attivare l'invio.
+#
+# Telegram: creare un bot con @BotFather su Telegram, incollare qui il token.
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+# Solo per mostrare agli allievi un link diretto al bot nel portale (facoltativo).
+TELEGRAM_BOT_USERNAME = os.environ.get('TELEGRAM_BOT_USERNAME', '')
+
+# WhatsApp: richiede un account WhatsApp Business Cloud API (Meta for
+# Developers) già configurato e verificato — questa piattaforma fornisce solo
+# l'integrazione, non l'account. Vedi README per i dettagli.
+WHATSAPP_ACCESS_TOKEN = os.environ.get('WHATSAPP_ACCESS_TOKEN', '')
+WHATSAPP_PHONE_NUMBER_ID = os.environ.get('WHATSAPP_PHONE_NUMBER_ID', '')

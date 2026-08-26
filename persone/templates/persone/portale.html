@@ -105,4 +105,33 @@
         </ul>
     </div>
 </div>
+
+{% if telegram_abilitato %}
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <h2 class="h5 card-title">Notifiche su Telegram</h2>
+        {% if telegram_link.collegato %}
+        <p class="text-success mb-2">✅ Telegram collegato: riceverai qui promemoria e avvisi.</p>
+        <form method="post" action="{% url 'persone:telegram_scollega' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Scollega</button>
+        </form>
+        {% elif telegram_link.codice_collegamento %}
+        <p class="mb-2">
+            Apri
+            {% if telegram_bot_username %}<a href="https://t.me/{{ telegram_bot_username }}" target="_blank" rel="noopener">il bot Telegram del centro</a>{% else %}il bot Telegram del centro{% endif %}
+            e invia questo messaggio:
+        </p>
+        <p><code>/link {{ telegram_link.codice_collegamento }}</code></p>
+        <p class="text-muted small mb-0">Il collegamento avviene entro qualche minuto dall'invio.</p>
+        {% else %}
+        <p class="text-muted mb-2">Ricevi i promemoria delle lezioni e gli alert di scadenza anche su Telegram.</p>
+        <form method="post" action="{% url 'persone:telegram_genera_codice' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-primary btn-sm">Genera codice di collegamento</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

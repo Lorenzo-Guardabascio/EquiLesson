@@ -36,18 +36,23 @@ class Command(BaseCommand):
 
     @staticmethod
     def _invia_se_nuovo(tipo, allievo, riferimento, oggetto, corpo):
-        """Invia solo se non risulta già inviato un avviso identico; ritorna True se ha inviato.
+        """Invia solo se non risulta già un avviso identico registrato; ritorna True se ha inviato.
 
-        Se l'allievo non ha un'email non viene registrato nulla: se in futuro gli si
-        aggiunge un indirizzo, l'avviso deve poter ancora partire, non restare bloccato
-        da una riga di dedupe creata quando non c'era modo di inviarlo.
+        La riga di dedupe si registra SOLO dopo un invio riuscito su almeno un
+        canale (non prima): un allievo senza alcun canale disponibile oggi (né
+        email né Telegram collegato) deve poter ricevere l'avviso il giorno in
+        cui gliene viene attivato uno, non restare bloccato per sempre da una
+        riga scritta quando non c'era modo di raggiungerlo.
         """
-        if not allievo.email:
+        già_inviato = NotificaInviata.objects.filter(
+            tipo=tipo, allievo=allievo, riferimento=riferimento
+        ).exists()
+        if già_inviato:
             return False
-        _, creata = NotificaInviata.objects.get_or_create(tipo=tipo, allievo=allievo, riferimento=riferimento)
-        if not creata:
-            return False
-        return invia_notifica_allievo(oggetto, corpo, allievo)
+        inviato = invia_notifica_allievo(oggetto, corpo, allievo)
+        if inviato:
+            NotificaInviata.objects.get_or_create(tipo=tipo, allievo=allievo, riferimento=riferimento)
+        return inviato
 
     def _promemoria_lezioni(self, oggi):
         domani = oggi + timedelta(days=GIORNI_PREAVVISO_LEZIONE)

@@ -6,4 +6,6 @@ app_name = "persone"
 
 urlpatterns = [
     path("portale/", views.portale, name="portale"),
+    path("portale/telegram/genera-codice/", views.telegram_genera_codice, name="telegram_genera_codice"),
+    path("portale/telegram/scollega/", views.telegram_scollega, name="telegram_scollega"),
 ]

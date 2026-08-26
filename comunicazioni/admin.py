@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 
-from .models import Comunicazione, NotificaInviata
+from .models import Comunicazione, NotificaInviata, TelegramLink
 from .services import invia_broadcast
 
 
@@ -62,3 +62,19 @@ class ComunicazioneAdmin(admin.ModelAdmin):
             self.message_user(
                 request, f"Comunicazione inviata a {obj.destinatari_count} allievi.", level=messages.SUCCESS
             )
+
+
+@admin.register(TelegramLink)
+class TelegramLinkAdmin(admin.ModelAdmin):
+    """Sola consultazione: il collegamento lo fa l'allievo dal portale via `telegram_poll`."""
+
+    list_display = ("allievo", "collegato", "collegato_il")
+    list_filter = ("collegato_il",)
+    search_fields = ("allievo__nome", "allievo__cognome")
+    readonly_fields = ("allievo", "chat_id", "codice_collegamento", "collegato_il")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

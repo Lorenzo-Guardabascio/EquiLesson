@@ -61,3 +61,57 @@ class Comunicazione(models.Model):
 
     def __str__(self):
         return self.oggetto
+
+
+class TelegramLink(models.Model):
+    """Collegamento tra un Allievo e la sua chat Telegram (per l'invio notifiche).
+
+    Il collegamento avviene per polling (`manage.py telegram_poll`), non via
+    webhook: il server non è esposto su internet, quindi non può ricevere
+    richieste in ingresso da Telegram — deve essere lui a chiedere gli
+    aggiornamenti a intervalli regolari.
+    """
+
+    allievo = models.OneToOneField(Allievo, on_delete=models.CASCADE, related_name="telegram_link")
+    chat_id = models.CharField(max_length=64, blank=True)
+    codice_collegamento = models.CharField(
+        max_length=12,
+        blank=True,
+        help_text="Codice mostrato all'allievo nel portale, da inviare al bot per collegare l'account.",
+    )
+    collegato_il = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "collegamento Telegram"
+        verbose_name_plural = "collegamenti Telegram"
+
+    def __str__(self):
+        stato = "collegato" if self.chat_id else "non collegato"
+        return f"{self.allievo} ({stato})"
+
+    @property
+    def collegato(self):
+        return bool(self.chat_id)
+
+
+class TelegramPollState(models.Model):
+    """Tiene il segnalibro (update_id) dell'ultimo messaggio Telegram già letto.
+
+    Singleton (pk=1): un solo bot, un solo cursore di lettura condiviso da
+    ogni esecuzione di `manage.py telegram_poll`.
+    """
+
+    ultimo_update_id = models.BigIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "stato polling Telegram"
+        verbose_name_plural = "stato polling Telegram"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
