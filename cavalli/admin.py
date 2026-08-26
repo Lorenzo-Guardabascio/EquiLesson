@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from core.admin_widgets import DATE_TIME_FORMFIELD_OVERRIDES
+
 from .models import Cavallo
 
 
@@ -8,3 +10,4 @@ class CavalloAdmin(admin.ModelAdmin):
     list_display = ("nome", "tipo", "livello_impiego", "disponibile", "proprietario")
     list_filter = ("tipo", "livello_impiego", "disponibile")
     search_fields = ("nome", "microchip")
+    formfield_overrides = DATE_TIME_FORMFIELD_OVERRIDES

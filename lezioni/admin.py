@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from core.admin_widgets import DATE_TIME_FORMFIELD_OVERRIDES
+
 from .models import Campo, Lezione, Partecipazione, TipoLezione
 
 
@@ -14,6 +16,7 @@ class LezioneAdmin(admin.ModelAdmin):
     list_filter = ("stato", "tipo_lezione", "campo", "istruttore")
     date_hierarchy = "data"
     inlines = [PartecipazioneInline]
+    formfield_overrides = DATE_TIME_FORMFIELD_OVERRIDES
 
 
 @admin.register(Campo)

@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from core.admin_widgets import DATE_TIME_FORMFIELD_OVERRIDES
+
 from .models import Allievo, Documento, Istruttore, Proprietario, Tutore
 
 
@@ -15,6 +17,7 @@ class AllievoAdmin(admin.ModelAdmin):
     search_fields = ("nome", "cognome", "codice_fiscale")
     filter_horizontal = ("tutori",)
     inlines = [DocumentoInline]
+    formfield_overrides = DATE_TIME_FORMFIELD_OVERRIDES
 
 
 @admin.register(Tutore)
