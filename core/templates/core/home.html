@@ -1,0 +1,74 @@
+{% extends "core/base.html" %}
+
+{% block title %}Home - Gestionale maneggio{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.is_staff %}
+<h1 class="h3 mb-4">Bentornato, {{ user.get_full_name|default:user.username }}</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm"><div class="card-body">
+            <div class="fs-2 fw-bold">{{ n_allievi_attivi }}</div>
+            <div class="text-muted">Allievi attivi</div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm"><div class="card-body">
+            <div class="fs-2 fw-bold">{{ n_cavalli }}</div>
+            <div class="text-muted">Cavalli</div>
+        </div></div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm"><div class="card-body">
+            <div class="fs-2 fw-bold">{{ n_lezioni_oggi }}</div>
+            <div class="text-muted">Lezioni oggi</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <h2 class="h5">Prossime lezioni</h2>
+        <ul class="list-group">
+            {% for l in prossime_lezioni %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ l.data|date:"d/m" }} {{ l.ora_inizio|time:"H:i" }} — {{ l.tipo_lezione }}</span>
+                <span class="badge text-bg-secondary">{{ l.get_stato_display }}</span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Nessuna lezione in programma.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <h2 class="h5">Certificati medici in scadenza (30 giorni)</h2>
+        <ul class="list-group">
+            {% for a in scadenze_certificati %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ a }}</span>
+                <span class="badge text-bg-warning">{{ a.certificato_medico_scadenza|date:"d/m/Y" }}</span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Nessuna scadenza imminente.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="/admin/" class="btn btn-primary">Vai all'amministrazione</a>
+</div>
+
+{% elif user.is_authenticated %}
+<h1 class="h3">Ciao, {{ user.get_full_name|default:user.username }}</h1>
+<p class="text-muted">Il portale con le tue lezioni e il pacchetto residuo arriva a breve.</p>
+
+{% else %}
+<div class="text-center py-5">
+    <h1 class="h3 mb-3">🐴 Gestionale maneggio</h1>
+    <p class="text-muted mb-4">Accedi per continuare.</p>
+    <a href="{% url 'core:login' %}" class="btn btn-primary">Accedi</a>
+</div>
+{% endif %}
+{% endblock %}
