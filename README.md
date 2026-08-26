@@ -1,3 +1,5 @@
+🇮🇹 Italiano · [🇬🇧 English](README.en.md)
+
 # EquiLesson
 
 Gestionale open source per centri ippici: allievi, cavalli, lezioni,
@@ -71,8 +73,11 @@ DEFAULT_FROM_EMAIL=...
   lezioni/partecipazioni, sola lettura su allievi/cavalli/campi/pacchetti,
   nessun accesso ai documenti riservati (certificati, dati sensibili).
 - **Allievi/genitori** (gruppo "Allievi", `is_staff=False`): nessun accesso
-  admin, solo il portale di sola lettura in `/persone/portale/` (proprie
-  lezioni + stato pacchetto). Non possono prenotare o disdire da soli.
+  admin, portale in `/persone/portale/` con le proprie lezioni e lo stato
+  del pacchetto. Se l'amministratore attiva l'opzione "Prenotazione autonoma"
+  (in `/admin/core/impostazioni/`, **disattivata di default**), possono anche
+  prenotare/annullare da soli la propria partecipazione a lezioni con posti
+  liberi — il cavallo resta comunque assegnato dalla segreteria.
 
 ## App
 
@@ -90,12 +95,20 @@ DEFAULT_FROM_EMAIL=...
 
 - Pagamenti/fatturazione: nessun incasso tracciato in nessun punto del
   sistema (i pacchetti hanno solo un prezzo di riferimento informativo).
-- Prenotazione/disdetta autonoma da parte di allievi: le lezioni le gestiscono
-  solo admin/segreteria.
-- Lista d'attesa lezioni.
-- Regole rigide di preavviso disdetta: a discrezione della segreteria.
+- Lista d'attesa automatica per le lezioni: con i numeri di un centro
+  ippico tipico si gestisce a voce più in fretta di quanto costerebbe
+  costruirla e mantenerla.
+- Tracciamento di un livello/progressione tecnica dell'allievo: EquiLesson
+  registra solo la propensione verso un tipo di lezione, non una valutazione
+  di competenza.
+- Regole rigide di preavviso disdetta: a discrezione della segreteria, il
+  sistema non le impone.
+- Piattaforma multi-tenant centralizzata: ogni installazione è indipendente
+  (vedi "Adottarlo per il tuo maneggio").
 
-## Roadmap MVP
+## Roadmap
+
+**MVP (completo):**
 
 1. ~~Ruoli e permessi~~ ✅
 2. ~~Calendario lezioni~~ ✅
@@ -103,9 +116,20 @@ DEFAULT_FROM_EMAIL=...
 4. ~~Notifiche/comunicazioni~~ ✅
 5. ~~Report~~ ✅
 
-Estensioni future possibili (non bloccanti per l'MVP): rifinitura estetica
-dedicata, gestione gare/eventi, pagina impostazioni centralizzata, magazzino/
-tack room, app mobile, check-in su tablet, fatturazione (fase 2).
+**Fase 2 (in corso), nata da un confronto con altri gestionali del settore:**
+
+- [x] Prenotazione autonoma allievi, attivabile/disattivabile dall'admin
+- [ ] Notifiche via Telegram e WhatsApp, oltre all'email
+- [ ] Scadenze sanitarie strutturate per i cavalli (vaccinazioni, ferrature, sverminazioni) con promemoria automatico
+- [ ] Export dei report in CSV/PDF
+- [ ] Portale di sola lettura per i proprietari di cavalli in pensione
+- [ ] Consenso privacy/liberatoria con tracciamento di accettazione (data, non solo una checkbox)
+- [ ] Tessera digitale con QR per gli allievi
+- [ ] Interfaccia bilingue italiano/inglese
+
+Estensioni future possibili (non bloccanti): rifinitura estetica dedicata,
+gestione gare/eventi, piano alimentare cavallo, magazzino/tack room, app
+mobile, check-in su tablet, fatturazione, sito web pubblico del centro.
 
 ## Adottarlo per il tuo maneggio
 
@@ -115,9 +139,14 @@ database): ogni struttura ha una propria copia, configurabile nei tipi di
 lezione, nei tagli di pacchetto, nei campi, ecc. Puoi clonare il repo e
 installarlo da solo seguendo la sezione "Setup sviluppo" qui sopra (per la
 produzione serve in più un database Postgres dedicato e un reverse proxy con
-HTTPS davanti a Django — non ancora documentato in dettaglio in questo
-repo). Se preferisci un'installazione, personalizzazione o assistenza
-gestita invece di farlo da solo, apri una issue o scrivi al mantenitore.
+HTTPS davanti a Django — non ancora documentato in dettaglio in questo repo).
+
+**Ti piace il progetto?** Il codice resta gratuito sotto AGPL-3.0: puoi
+scaricarlo e farlo girare da solo senza dovermi nulla. Se preferisci non
+occupartene tu — installazione sul tuo server, configurazione su misura per
+il tuo centro, migrazione dei dati esistenti, assistenza continuativa — è un
+servizio a pagamento: apri una issue o scrivi a dragonknigth09@gmail.com. Il
+progetto resta gratis, il mio tempo no.
 
 ## Licenza
 
