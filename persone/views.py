@@ -11,7 +11,14 @@ from core.models import Impostazioni
 from lezioni.models import Partecipazione
 from pacchetti.models import Pacchetto
 
+from .consensi_testi import TESTO_FOTO_VIDEO, TESTO_PRIVACY
 from .decorators import allievo_required, proprietario_required
+from .models import ConsensoLog
+
+TESTI_CONSENSO = {
+    ConsensoLog.Tipo.PRIVACY: TESTO_PRIVACY,
+    ConsensoLog.Tipo.FOTO_VIDEO: TESTO_FOTO_VIDEO,
+}
 
 
 def _genera_codice_telegram():
@@ -62,6 +69,23 @@ def portale(request):
 
     telegram_link = TelegramLink.objects.filter(allievo=allievo).first()
 
+    consensi = [
+        {
+            "tipo": ConsensoLog.Tipo.PRIVACY,
+            "etichetta": ConsensoLog.Tipo.PRIVACY.label,
+            "testo": TESTO_PRIVACY,
+            "dato": allievo.consenso_privacy,
+            "ultimo": allievo.consensi.filter(tipo=ConsensoLog.Tipo.PRIVACY).first(),
+        },
+        {
+            "tipo": ConsensoLog.Tipo.FOTO_VIDEO,
+            "etichetta": ConsensoLog.Tipo.FOTO_VIDEO.label,
+            "testo": TESTO_FOTO_VIDEO,
+            "dato": allievo.consenso_foto_video,
+            "ultimo": allievo.consensi.filter(tipo=ConsensoLog.Tipo.FOTO_VIDEO).first(),
+        },
+    ]
+
     return render(request, "persone/portale.html", {
         "allievo": allievo,
         "partecipazioni_future": partecipazioni_future,
@@ -73,7 +97,29 @@ def portale(request):
         "telegram_abilitato": Impostazioni.get().notifiche_telegram_abilitate,
         "telegram_link": telegram_link,
         "telegram_bot_username": settings.TELEGRAM_BOT_USERNAME,
+        "consensi": consensi,
     })
+
+
+@allievo_required
+def accetta_consenso(request, tipo):
+    if request.method != "POST" or tipo not in TESTI_CONSENSO:
+        return redirect("persone:portale")
+
+    allievo = request.user.allievo
+    testo = TESTI_CONSENSO[tipo]
+    ConsensoLog.objects.create(
+        allievo=allievo,
+        tipo=tipo,
+        indirizzo_ip=request.META.get("REMOTE_ADDR"),
+        testo_accettato=testo,
+    )
+    campo_booleano = "consenso_privacy" if tipo == ConsensoLog.Tipo.PRIVACY else "consenso_foto_video"
+    setattr(allievo, campo_booleano, True)
+    allievo.save(update_fields=[campo_booleano])
+
+    messages.success(request, "Consenso registrato.")
+    return redirect("persone:portale")
 
 
 @allievo_required

@@ -170,3 +170,34 @@ class Documento(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.allievo}"
+
+
+class ConsensoLog(models.Model):
+    """Traccia di un'accettazione consenso dal portale: non è una firma
+    digitale qualificata (per quella serve un provider accreditato, es.
+    Namirial/InfoCert) ma un'accettazione con timestamp, IP e testo esatto
+    mostrato — prova sufficiente di consenso informato per uso interno,
+    già più solida del semplice flag booleano che sostituisce.
+
+    Ogni riga è un'accettazione storica: se il testo cambia o il consenso
+    va rinnovato, se ne crea una nuova invece di modificare quella
+    precedente, così la storia resta consultabile.
+    """
+
+    class Tipo(models.TextChoices):
+        PRIVACY = "privacy", "Trattamento dati personali"
+        FOTO_VIDEO = "foto_video", "Liberatoria foto/video"
+
+    allievo = models.ForeignKey(Allievo, on_delete=models.CASCADE, related_name="consensi")
+    tipo = models.CharField(max_length=20, choices=Tipo.choices)
+    accettato_il = models.DateTimeField(auto_now_add=True)
+    indirizzo_ip = models.GenericIPAddressField(null=True, blank=True)
+    testo_accettato = models.TextField(help_text="Copia esatta del testo mostrato al momento dell'accettazione.")
+
+    class Meta:
+        ordering = ["-accettato_il"]
+        verbose_name = "consenso accettato"
+        verbose_name_plural = "consensi accettati"
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.allievo} ({self.accettato_il:%d/%m/%Y %H:%M})"

@@ -134,4 +134,32 @@
     </div>
 </div>
 {% endif %}
+
+<div class="card shadow-sm mt-4">
+    <div class="card-body">
+        <h2 class="h5 card-title">Consensi</h2>
+        {% for c in consensi %}
+        <div class="border-bottom pb-3 mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <strong>{{ c.etichetta }}</strong>
+                {% if c.dato %}
+                <span class="badge text-bg-success">Accettato{% if c.ultimo %} il {{ c.ultimo.accettato_il|date:"d/m/Y" }}{% endif %}</span>
+                {% else %}
+                <span class="badge text-bg-secondary">Non ancora accettato</span>
+                {% endif %}
+            </div>
+            <p class="text-muted small mt-2 mb-2">{{ c.testo }}</p>
+            {% if not c.dato %}
+            <form method="post" action="{% url 'persone:accetta_consenso' c.tipo %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-primary">Accetto</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <p class="text-muted small mb-0">
+            L'accettazione viene registrata con data/ora e indirizzo IP, insieme al testo esatto mostrato qui sopra.
+        </p>
+    </div>
+</div>
 {% endblock %}
