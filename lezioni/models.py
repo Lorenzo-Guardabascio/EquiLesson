@@ -12,6 +12,8 @@ class Campo(models.Model):
 
     class Meta:
         ordering = ["nome"]
+        verbose_name = "campo"
+        verbose_name_plural = "campi"
 
     def __str__(self):
         return self.nome
@@ -26,6 +28,8 @@ class TipoLezione(models.Model):
 
     class Meta:
         ordering = ["nome"]
+        verbose_name = "tipo di lezione"
+        verbose_name_plural = "tipi di lezione"
 
     def __str__(self):
         return self.nome
@@ -57,6 +61,8 @@ class Lezione(models.Model):
 
     class Meta:
         ordering = ["data", "ora_inizio"]
+        verbose_name = "lezione"
+        verbose_name_plural = "lezioni"
 
     def __str__(self):
         return f"{self.tipo_lezione} - {self.data} {self.ora_inizio:%H:%M}"
@@ -93,6 +99,8 @@ class Partecipazione(models.Model):
     class Meta:
         unique_together = ("lezione", "allievo")
         ordering = ["lezione"]
+        verbose_name = "partecipazione"
+        verbose_name_plural = "partecipazioni"
 
     def __str__(self):
         return f"{self.allievo} @ {self.lezione}"

@@ -43,6 +43,8 @@ class Cavallo(models.Model):
 
     class Meta:
         ordering = ["nome"]
+        verbose_name = "cavallo"
+        verbose_name_plural = "cavalli"
 
     def __str__(self):
         return self.nome

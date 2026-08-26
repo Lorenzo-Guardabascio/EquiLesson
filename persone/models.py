@@ -20,6 +20,8 @@ class Tutore(models.Model):
 
     class Meta:
         ordering = ["cognome", "nome"]
+        verbose_name = "tutore"
+        verbose_name_plural = "tutori"
 
     def __str__(self):
         return f"{self.nome} {self.cognome}"
@@ -35,6 +37,8 @@ class Proprietario(models.Model):
 
     class Meta:
         ordering = ["cognome", "nome"]
+        verbose_name = "proprietario"
+        verbose_name_plural = "proprietari"
 
     def __str__(self):
         return f"{self.nome} {self.cognome}"
@@ -58,6 +62,8 @@ class Istruttore(models.Model):
 
     class Meta:
         ordering = ["cognome", "nome"]
+        verbose_name = "istruttore"
+        verbose_name_plural = "istruttori"
 
     def __str__(self):
         return f"{self.nome} {self.cognome}"
@@ -121,6 +127,8 @@ class Allievo(models.Model):
 
     class Meta:
         ordering = ["cognome", "nome"]
+        verbose_name = "allievo"
+        verbose_name_plural = "allievi"
 
     def __str__(self):
         return f"{self.nome} {self.cognome}"
@@ -149,6 +157,8 @@ class Documento(models.Model):
 
     class Meta:
         ordering = ["-caricato_il"]
+        verbose_name = "documento"
+        verbose_name_plural = "documenti"
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.allievo}"

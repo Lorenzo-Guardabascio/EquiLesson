@@ -21,6 +21,8 @@ class TipoPacchetto(models.Model):
 
     class Meta:
         ordering = ["numero_lezioni"]
+        verbose_name = "tipo di pacchetto"
+        verbose_name_plural = "tipi di pacchetto"
 
     def __str__(self):
         return f"{self.nome} ({self.numero_lezioni} lezioni)"
@@ -47,6 +49,8 @@ class Pacchetto(models.Model):
 
     class Meta:
         ordering = ["-data_inizio"]
+        verbose_name = "pacchetto"
+        verbose_name_plural = "pacchetti"
 
     def __str__(self):
         return f"{self.allievo} - {self.tipo_pacchetto} ({self.lezioni_residue} residue)"
