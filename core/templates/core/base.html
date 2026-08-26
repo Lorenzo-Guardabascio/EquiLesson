@@ -27,8 +27,10 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'lezioni:calendario' %}">Calendario</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'report:report' %}">Report</a></li>
                     <li class="nav-item"><a class="nav-link" href="/admin/">Amministrazione</a></li>
-                    {% elif user.is_authenticated %}
+                    {% elif user.allievo %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'persone:portale' %}">Le mie lezioni</a></li>
+                    {% elif user.proprietario %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'persone:portale_proprietario' %}">Il mio cavallo</a></li>
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">

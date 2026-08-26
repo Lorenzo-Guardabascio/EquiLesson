@@ -30,6 +30,14 @@ class Tutore(models.Model):
 class Proprietario(models.Model):
     """Proprietario di un cavallo tenuto in pensione (non di scuola)."""
 
+    utente = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="proprietario",
+        help_text="Account per il portale di sola lettura sul proprio cavallo, se attivato.",
+    )
     nome = models.CharField(max_length=100)
     cognome = models.CharField(max_length=100)
     telefono = models.CharField(max_length=30, blank=True)

@@ -11,7 +11,7 @@ from core.models import Impostazioni
 from lezioni.models import Partecipazione
 from pacchetti.models import Pacchetto
 
-from .decorators import allievo_required
+from .decorators import allievo_required, proprietario_required
 
 
 def _genera_codice_telegram():
@@ -98,3 +98,27 @@ def telegram_scollega(request):
     )
     messages.success(request, "Telegram scollegato.")
     return redirect("persone:portale")
+
+
+@proprietario_required
+def portale_proprietario(request):
+    """Portale di sola lettura per i proprietari di cavalli in pensione:
+    stato dei propri cavalli e prossime scadenze sanitarie."""
+    proprietario = request.user.proprietario
+    oggi = timezone.localdate()
+    limite_scadenza = oggi + timedelta(days=30)
+
+    cavalli = list(proprietario.cavalli.prefetch_related("scadenze_sanitarie").order_by("nome"))
+    for cavallo in cavalli:
+        # attributo attaccato qui invece che con un dict a parte: il template
+        # può leggerlo come un campo qualsiasi, senza bisogno di un filtro
+        # custom per il lookup su dizionario.
+        cavallo.scadenze_ordinate = [
+            {"scadenza": s, "urgente": s.data_scadenza <= limite_scadenza}
+            for s in sorted(cavallo.scadenze_sanitarie.all(), key=lambda s: s.data_scadenza)
+        ]
+
+    return render(request, "persone/portale_proprietario.html", {
+        "proprietario": proprietario,
+        "cavalli": cavalli,
+    })

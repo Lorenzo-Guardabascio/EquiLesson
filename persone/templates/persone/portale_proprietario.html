@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+
+{% block title %}Il mio portale - Gestionale maneggio{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Ciao, {{ proprietario.nome }}</h1>
+
+<div class="row g-4">
+    {% for cavallo in cavalli %}
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">{{ cavallo.nome }}</h2>
+                <dl class="row mb-3 small">
+                    {% if cavallo.razza %}
+                    <dt class="col-sm-4">Razza</dt><dd class="col-sm-8">{{ cavallo.razza }}</dd>
+                    {% endif %}
+                    {% if cavallo.box %}
+                    <dt class="col-sm-4">Box</dt><dd class="col-sm-8">{{ cavallo.box }}</dd>
+                    {% endif %}
+                    {% if cavallo.note_sanitarie %}
+                    <dt class="col-sm-4">Note</dt><dd class="col-sm-8">{{ cavallo.note_sanitarie }}</dd>
+                    {% endif %}
+                </dl>
+
+                <h3 class="h6">Prossime scadenze sanitarie</h3>
+                <ul class="list-group list-group-flush">
+                    {% for v in cavallo.scadenze_ordinate %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>{{ v.scadenza.get_tipo_display }}{% if v.scadenza.note %} — {{ v.scadenza.note }}{% endif %}</span>
+                        <span class="badge {% if v.urgente %}text-bg-warning{% else %}text-bg-secondary{% endif %}">
+                            {{ v.scadenza.data_scadenza|date:"d/m/Y" }}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item px-0 text-muted">Nessuna scadenza registrata.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <p class="text-muted">Non risulta nessun cavallo in pensione a tuo nome.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

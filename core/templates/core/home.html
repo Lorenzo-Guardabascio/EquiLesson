@@ -62,10 +62,15 @@
     <a href="/admin/" class="btn btn-outline-secondary">Vai all'amministrazione</a>
 </div>
 
-{% elif user.is_authenticated %}
+{% elif user.allievo %}
 <h1 class="h3">Ciao, {{ user.get_full_name|default:user.username }}</h1>
 <p class="text-muted">Consulta le tue prossime lezioni e il pacchetto residuo.</p>
 <a href="{% url 'persone:portale' %}" class="btn btn-primary">Vai al mio portale</a>
+
+{% elif user.proprietario %}
+<h1 class="h3">Ciao, {{ user.get_full_name|default:user.username }}</h1>
+<p class="text-muted">Consulta lo stato del tuo cavallo e le prossime scadenze sanitarie.</p>
+<a href="{% url 'persone:portale_proprietario' %}" class="btn btn-primary">Vai al mio portale</a>
 
 {% else %}
 <div class="text-center py-5">

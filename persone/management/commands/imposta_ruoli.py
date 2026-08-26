@@ -1,4 +1,5 @@
-"""Crea i gruppi di permessi (Istruttori, Allievi) e collega account di test agli istruttori demo.
+"""Crea i gruppi di permessi e gli account di accesso mancanti per istruttori,
+allievi attivi e proprietari di cavalli in pensione.
 
 Uso:
     python manage.py imposta_ruoli
@@ -13,7 +14,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.management.base import BaseCommand
 
-from persone.models import Allievo, Istruttore
+from persone.models import Allievo, Istruttore, Proprietario
 
 # Gli istruttori possono vedere e gestire lezioni/partecipazioni...
 ISTRUTTORI_GESTIONE = [
@@ -38,8 +39,8 @@ def genera_password():
 
 class Command(BaseCommand):
     help = (
-        "Crea i gruppi Istruttori/Allievi con i permessi di base e gli account di accesso "
-        "per istruttori e allievi che non ne hanno ancora uno."
+        "Crea i gruppi Istruttori/Allievi/Proprietari con i permessi di base e gli "
+        "account di accesso mancanti per istruttori, allievi attivi e proprietari."
     )
 
     def handle(self, *args, **options):
@@ -57,67 +58,59 @@ class Command(BaseCommand):
                 codename=f"view_{model}", content_type__app_label=app_label
             ))
         istruttori_group.permissions.set(permessi)
-
-        # Gruppo Allievi: nessun permesso admin (il gruppo esiste solo per riconoscere il
-        # ruolo). L'accesso vero è il portale dedicato di sola lettura, non l'admin di Django.
-        allievi_group, _ = Group.objects.get_or_create(name="Allievi")
-
         self.stdout.write(self.style.SUCCESS(
             f"Gruppo 'Istruttori' impostato con {istruttori_group.permissions.count()} permessi."
         ))
-        self.stdout.write("Gruppo 'Allievi' impostato (senza accesso admin, solo portale dedicato).")
 
-        # Collega un account di accesso a ogni istruttore demo che non ce l'ha già.
-        credenziali_istruttori = []
-        for istruttore in Istruttore.objects.filter(utente__isnull=True):
-            username = f"{istruttore.nome}.{istruttore.cognome}".lower().replace(" ", "")
+        # Allievi e Proprietari: nessun permesso admin (i gruppi esistono solo per
+        # riconoscere il ruolo). L'accesso vero sono i portali dedicati di sola
+        # lettura, non l'admin di Django.
+        allievi_group, _ = Group.objects.get_or_create(name="Allievi")
+        proprietari_group, _ = Group.objects.get_or_create(name="Proprietari")
+        self.stdout.write("Gruppi 'Allievi' e 'Proprietari' impostati (senza accesso admin, solo portale dedicato).")
+
+        self._crea_account_mancanti(
+            User, Istruttore.objects.filter(utente__isnull=True),
+            gruppo=istruttori_group, is_staff=True, etichetta="istruttore",
+        )
+        self._crea_account_mancanti(
+            User, Allievo.objects.filter(utente__isnull=True, stato=Allievo.Stato.ATTIVO),
+            gruppo=allievi_group, is_staff=False, etichetta="allievo",
+        )
+        self._crea_account_mancanti(
+            User, Proprietario.objects.filter(utente__isnull=True),
+            gruppo=proprietari_group, is_staff=False, etichetta="proprietario",
+        )
+
+    def _crea_account_mancanti(self, User, persone_senza_account, *, gruppo, is_staff, etichetta):
+        """Crea un login per ogni persona del queryset che non ne ha ancora uno.
+
+        Le tre categorie (istruttori/allievi/proprietari) condividono la stessa
+        forma di anagrafica (nome, cognome, email, campo `utente`) quindi la
+        stessa logica di creazione account basta per tutte e tre.
+        """
+        credenziali = []
+        for persona in persone_senza_account:
+            username = f"{persona.nome}.{persona.cognome}".lower().replace(" ", "")
             if User.objects.filter(username=username).exists():
                 continue
             password = genera_password()
             user = User.objects.create_user(
                 username=username,
-                email=istruttore.email,
+                email=persona.email,
                 password=password,
-                first_name=istruttore.nome,
-                last_name=istruttore.cognome,
-                is_staff=True,
+                first_name=persona.nome,
+                last_name=persona.cognome,
+                is_staff=is_staff,
             )
-            user.groups.add(istruttori_group)
-            istruttore.utente = user
-            istruttore.save(update_fields=["utente"])
-            credenziali_istruttori.append((username, password))
+            user.groups.add(gruppo)
+            persona.utente = user
+            persona.save(update_fields=["utente"])
+            credenziali.append((username, password))
 
-        if credenziali_istruttori:
-            self.stdout.write(self.style.SUCCESS("Account istruttore creati:"))
-            for username, password in credenziali_istruttori:
+        if credenziali:
+            self.stdout.write(self.style.SUCCESS(f"Account {etichetta} creati:"))
+            for username, password in credenziali:
                 self.stdout.write(f"  {username} / {password}")
         else:
-            self.stdout.write("Nessun nuovo account istruttore da creare (già collegati).")
-
-        # Collega un account di accesso (solo portale, mai staff) a ogni allievo attivo
-        # che non ce l'ha già.
-        credenziali_allievi = []
-        for allievo in Allievo.objects.filter(utente__isnull=True, stato=Allievo.Stato.ATTIVO):
-            username = f"{allievo.nome}.{allievo.cognome}".lower().replace(" ", "")
-            if User.objects.filter(username=username).exists():
-                continue
-            password = genera_password()
-            user = User.objects.create_user(
-                username=username,
-                email=allievo.email,
-                password=password,
-                first_name=allievo.nome,
-                last_name=allievo.cognome,
-                is_staff=False,
-            )
-            user.groups.add(allievi_group)
-            allievo.utente = user
-            allievo.save(update_fields=["utente"])
-            credenziali_allievi.append((username, password))
-
-        if credenziali_allievi:
-            self.stdout.write(self.style.SUCCESS("Account allievo (portale) creati:"))
-            for username, password in credenziali_allievi:
-                self.stdout.write(f"  {username} / {password}")
-        else:
-            self.stdout.write("Nessun nuovo account allievo da creare (già collegati o nessun allievo attivo).")
+            self.stdout.write(f"Nessun nuovo account {etichetta} da creare (già collegati o nessuno da collegare).")
