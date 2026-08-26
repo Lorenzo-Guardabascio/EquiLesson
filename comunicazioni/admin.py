@@ -11,9 +11,9 @@ class NotificaInviataAdmin(admin.ModelAdmin):
     È possibile eliminare una riga per forzare un nuovo invio dello stesso avviso.
     """
 
-    list_display = ("tipo", "allievo", "riferimento", "creata_il")
+    list_display = ("tipo", "allievo", "cavallo", "riferimento", "creata_il")
     list_filter = ("tipo",)
-    search_fields = ("allievo__nome", "allievo__cognome")
+    search_fields = ("allievo__nome", "allievo__cognome", "cavallo__nome")
     date_hierarchy = "creata_il"
 
     def has_add_permission(self, request):

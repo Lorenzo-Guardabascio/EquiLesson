@@ -49,6 +49,18 @@ def invia_notifica_allievo(oggetto, corpo, allievo):
     return inviato
 
 
+def invia_notifica_staff(oggetto, corpo):
+    """Invia un alert via email all'indirizzo staff configurato in Impostazioni
+    (per avvisi che non riguardano un allievo specifico, es. scadenze sanitarie
+    dei cavalli). Ritorna True se inviato, False se nessun indirizzo è configurato.
+    """
+    email_staff = Impostazioni.get().email_notifiche_staff
+    if not email_staff:
+        return False
+    send_mail(oggetto, corpo, settings.DEFAULT_FROM_EMAIL, [email_staff])
+    return True
+
+
 def invia_broadcast(comunicazione, utente):
     """Invia una Comunicazione a tutti gli allievi attivi con email, in Bcc
     (i destinatari non devono vedersi gli indirizzi a vicenda), più Telegram

@@ -5,6 +5,7 @@ from django.db.models import Count, Q
 from django.shortcuts import render
 from django.utils import timezone
 
+from cavalli.models import ScadenzaSanitaria
 from lezioni.models import Lezione, Partecipazione
 from pacchetti.models import Pacchetto
 from persone.models import Allievo
@@ -111,6 +112,20 @@ def _allievi_in_scadenza(oggi):
     return voci
 
 
+def _cavalli_in_scadenza(oggi):
+    limite = oggi + timedelta(days=GIORNI_PREAVVISO_SCADENZE)
+    voci = []
+    for scadenza in ScadenzaSanitaria.objects.filter(data_scadenza__lte=limite).select_related("cavallo"):
+        voci.append({
+            "cavallo": scadenza.cavallo,
+            "tipo": scadenza.get_tipo_display(),
+            "scadenza": scadenza.data_scadenza,
+            "scaduto": scadenza.data_scadenza < oggi,
+        })
+    voci.sort(key=lambda v: v["scadenza"])
+    return voci
+
+
 @staff_member_required
 def report(request):
     dal, al = _periodo(request)
@@ -124,4 +139,5 @@ def report(request):
         "occupazione_istruttori": _occupazione_istruttori(dal, al),
         "occupazione_campi": _occupazione_campi(dal, al),
         "scadenze": _allievi_in_scadenza(oggi),
+        "scadenze_cavalli": _cavalli_in_scadenza(oggi),
     })

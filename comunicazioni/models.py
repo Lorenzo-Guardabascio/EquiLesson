@@ -19,20 +19,32 @@ class NotificaInviata(models.Model):
         SCADENZA_FISE = "scadenza_fise", "Scadenza tessera FISE"
         SCADENZA_FITETREK = "scadenza_fitetrek", "Scadenza tessera FITETREK"
         SCADENZA_PACCHETTO = "scadenza_pacchetto", "Scadenza pacchetto"
+        SCADENZA_SANITARIA_CAVALLO = "scadenza_sanitaria_cavallo", "Scadenza sanitaria cavallo"
 
     tipo = models.CharField(max_length=30, choices=Tipo.choices)
-    allievo = models.ForeignKey(Allievo, on_delete=models.CASCADE, related_name="notifiche_inviate")
+    # Uno solo dei due è valorizzato: allievo per le notifiche personali,
+    # cavallo per le scadenze sanitarie (che vanno allo staff, non a un
+    # allievo). Entrambi nullable per questo — i controlli di deduplica
+    # includono sempre esplicitamente entrambi i campi, non solo uno, così
+    # due cavalli diversi con la stessa scadenza non si scavalcano a vicenda.
+    allievo = models.ForeignKey(
+        Allievo, on_delete=models.CASCADE, null=True, blank=True, related_name="notifiche_inviate"
+    )
+    cavallo = models.ForeignKey(
+        "cavalli.Cavallo", on_delete=models.CASCADE, null=True, blank=True, related_name="notifiche_inviate"
+    )
     riferimento = models.DateField(help_text="Data a cui si riferisce l'avviso (lezione o scadenza).")
     creata_il = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("tipo", "allievo", "riferimento")
+        unique_together = ("tipo", "allievo", "cavallo", "riferimento")
         ordering = ["-creata_il"]
         verbose_name = "notifica inviata"
         verbose_name_plural = "notifiche inviate"
 
     def __str__(self):
-        return f"{self.get_tipo_display()} - {self.allievo} ({self.riferimento:%d/%m/%Y})"
+        soggetto = self.allievo or self.cavallo
+        return f"{self.get_tipo_display()} - {soggetto} ({self.riferimento:%d/%m/%Y})"
 
 
 class Comunicazione(models.Model):

@@ -111,25 +111,54 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h2 class="h5 card-title">Allievi in scadenza (prossimi 30 giorni)</h2>
-        <div class="table-responsive">
-        <table class="table table-sm align-middle">
-            <thead><tr><th>Allievo</th><th>Tipo</th><th>Scadenza</th><th></th></tr></thead>
-            <tbody>
-                {% for v in scadenze %}
-                <tr>
-                    <td>{{ v.allievo }}</td>
-                    <td>{{ v.tipo }}</td>
-                    <td>{{ v.scadenza|date:"d/m/Y" }}</td>
-                    <td>{% if v.scaduto %}<span class="badge text-bg-danger">Scaduto</span>{% else %}<span class="badge text-bg-warning">In scadenza</span>{% endif %}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="4" class="text-muted">Nessuna scadenza nei prossimi 30 giorni.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Allievi in scadenza (prossimi 30 giorni)</h2>
+                <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>Allievo</th><th>Tipo</th><th>Scadenza</th><th></th></tr></thead>
+                    <tbody>
+                        {% for v in scadenze %}
+                        <tr>
+                            <td>{{ v.allievo }}</td>
+                            <td>{{ v.tipo }}</td>
+                            <td>{{ v.scadenza|date:"d/m/Y" }}</td>
+                            <td>{% if v.scaduto %}<span class="badge text-bg-danger">Scaduto</span>{% else %}<span class="badge text-bg-warning">In scadenza</span>{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted">Nessuna scadenza nei prossimi 30 giorni.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Cavalli: scadenze sanitarie (prossimi 30 giorni)</h2>
+                <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead><tr><th>Cavallo</th><th>Tipo</th><th>Scadenza</th><th></th></tr></thead>
+                    <tbody>
+                        {% for v in scadenze_cavalli %}
+                        <tr>
+                            <td>{{ v.cavallo }}</td>
+                            <td>{{ v.tipo }}</td>
+                            <td>{{ v.scadenza|date:"d/m/Y" }}</td>
+                            <td>{% if v.scaduto %}<span class="badge text-bg-danger">Scaduto</span>{% else %}<span class="badge text-bg-warning">In scadenza</span>{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-muted">Nessuna scadenza sanitaria nei prossimi 30 giorni.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

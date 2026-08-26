@@ -38,7 +38,9 @@ class Cavallo(models.Model):
 
     box = models.CharField(max_length=50, blank=True, help_text="Solo per cavalli in pensione.")
     note_sanitarie = models.TextField(
-        blank=True, help_text="Vaccinazioni, sverminazioni, ferrature, veterinario..."
+        blank=True,
+        help_text="Note libere aggiuntive. Le scadenze da tenere sotto controllo vanno in "
+        "'Scadenze sanitarie' qui sotto, non qui: solo così generano un promemoria automatico.",
     )
 
     class Meta:
@@ -48,3 +50,32 @@ class Cavallo(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class ScadenzaSanitaria(models.Model):
+    """Un evento sanitario datato del cavallo (prossima vaccinazione, ferratura...).
+
+    A differenza di `note_sanitarie` (testo libero) questa ha una data
+    strutturata: solo così il comando `invia_notifiche` può generare un
+    promemoria automatico invece di richiedere un controllo manuale.
+    """
+
+    class Tipo(models.TextChoices):
+        VACCINAZIONE = "vaccinazione", "Vaccinazione"
+        SVERMINAZIONE = "sverminazione", "Sverminazione"
+        FERRATURA = "ferratura", "Ferratura"
+        VISITA_VETERINARIA = "visita_veterinaria", "Visita veterinaria"
+        ALTRO = "altro", "Altro"
+
+    cavallo = models.ForeignKey(Cavallo, on_delete=models.CASCADE, related_name="scadenze_sanitarie")
+    tipo = models.CharField(max_length=30, choices=Tipo.choices, default=Tipo.ALTRO)
+    data_scadenza = models.DateField(verbose_name="Prossima scadenza")
+    note = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["data_scadenza"]
+        verbose_name = "scadenza sanitaria"
+        verbose_name_plural = "scadenze sanitarie"
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.cavallo} ({self.data_scadenza:%d/%m/%Y})"
