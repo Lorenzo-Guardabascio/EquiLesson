@@ -63,7 +63,8 @@
 
 {% elif user.is_authenticated %}
 <h1 class="h3">Ciao, {{ user.get_full_name|default:user.username }}</h1>
-<p class="text-muted">Il portale con le tue lezioni e il pacchetto residuo arriva a breve.</p>
+<p class="text-muted">Consulta le tue prossime lezioni e il pacchetto residuo.</p>
+<a href="{% url 'persone:portale' %}" class="btn btn-primary">Vai al mio portale</a>
 
 {% else %}
 <div class="text-center py-5">

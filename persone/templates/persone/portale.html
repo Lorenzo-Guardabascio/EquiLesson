@@ -1,0 +1,97 @@
+{% extends "core/base.html" %}
+
+{% block title %}Il mio portale - Gestionale maneggio{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Ciao, {{ allievo.nome }}</h1>
+
+{% if scadenze %}
+<div class="row g-2 mb-4">
+    {% for s in scadenze %}
+    <div class="col-md-4">
+        <div class="alert {% if s.urgente %}alert-warning{% else %}alert-light border{% endif %} mb-0 py-2 px-3">
+            <strong>{{ s.etichetta }}</strong>: scade il {{ s.scadenza|date:"d/m/Y" }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Il mio pacchetto</h2>
+                {% if pacchetto_attivo %}
+                <p class="mb-1">{{ pacchetto_attivo.tipo_pacchetto.nome }}</p>
+                <div class="fs-2 fw-bold">{{ pacchetto_attivo.lezioni_residue }} <span class="fs-6 text-muted">/ {{ pacchetto_attivo.lezioni_totali }} lezioni residue</span></div>
+                <p class="text-muted mb-0">Valido fino al {{ pacchetto_attivo.data_scadenza|date:"d/m/Y" }}</p>
+                {% else %}
+                <p class="text-muted mb-0">Nessun pacchetto attivo al momento.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5 card-title">Storico pacchetti</h2>
+                <ul class="list-group list-group-flush">
+                    {% for p in pacchetti %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>{{ p.tipo_pacchetto.nome }} — dal {{ p.data_inizio|date:"d/m/Y" }} al {{ p.data_scadenza|date:"d/m/Y" }}</span>
+                        <span class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">{{ p.lezioni_residue }}/{{ p.lezioni_totali }} residue</span>
+                            <span class="badge text-bg-secondary">{{ p.get_stato_display }}</span>
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item px-0 text-muted">Nessun pacchetto registrato.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <h2 class="h5">Prossime lezioni</h2>
+        <ul class="list-group">
+            {% for p in partecipazioni_future %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>{{ p.lezione.data|date:"d/m/Y" }} {{ p.lezione.ora_inizio|time:"H:i" }} — {{ p.lezione.tipo_lezione }}</span>
+                    <span class="badge text-bg-secondary">{{ p.lezione.get_stato_display }}</span>
+                </div>
+                <div class="text-muted small mt-1">
+                    {% if p.cavallo %}Cavallo: {{ p.cavallo }} · {% endif %}
+                    {% if p.lezione.istruttore %}Istruttore: {{ p.lezione.istruttore }} · {% endif %}
+                    {% if p.lezione.campo %}Campo: {{ p.lezione.campo }}{% endif %}
+                </div>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Nessuna lezione in programma.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-lg-6">
+        <h2 class="h5">Lezioni passate (ultime 10)</h2>
+        <ul class="list-group">
+            {% for p in partecipazioni_passate %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>{{ p.lezione.data|date:"d/m/Y" }} {{ p.lezione.ora_inizio|time:"H:i" }} — {{ p.lezione.tipo_lezione }}</span>
+                    <span class="badge {% if p.stato == 'assente' %}text-bg-danger{% elif p.stato == 'svolta' %}text-bg-success{% else %}text-bg-secondary{% endif %}">{{ p.get_stato_display }}</span>
+                </div>
+                <div class="text-muted small mt-1">
+                    {% if p.cavallo %}Cavallo: {{ p.cavallo }}{% endif %}
+                </div>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Nessuna lezione passata registrata.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
