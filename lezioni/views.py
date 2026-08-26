@@ -3,12 +3,18 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
+from django.db.models import Count, F, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
+
+from core.decorators import richiede_impostazione
+from core.models import Impostazioni
+from persone.decorators import allievo_required
 
 from .forms import LezioneForm, PartecipazioneFormSet
-from .models import Lezione
+from .models import Lezione, Partecipazione
 
 # Colore per stato lezione (esadecimale, usato dal calendario).
 COLORE_STATO = {
@@ -93,3 +99,98 @@ def lezione_elimina(request, pk):
         messages.success(request, "Lezione eliminata.")
         return redirect("lezioni:calendario")
     return render(request, "lezioni/lezione_conferma_elimina.html", {"lezione": lezione})
+
+
+def _prenotazione_autonoma_attiva():
+    return Impostazioni.get().prenotazione_autonoma_abilitata
+
+
+_MESSAGGIO_FEATURE_DISATTIVA = "La prenotazione autonoma non è attiva al momento: contatta la segreteria."
+
+
+@allievo_required
+@richiede_impostazione(_prenotazione_autonoma_attiva, "persone:portale", _MESSAGGIO_FEATURE_DISATTIVA)
+def prenota(request):
+    """Elenco delle lezioni future aperte alla prenotazione autonoma (posti liberi, non già proprie)."""
+    allievo = request.user.allievo
+    oggi = timezone.localdate()
+
+    lezioni_aperte = (
+        Lezione.objects.filter(data__gte=oggi)
+        .exclude(stato=Lezione.Stato.ANNULLATA)
+        .exclude(
+            Q(partecipazioni__allievo=allievo)
+            & ~Q(partecipazioni__stato=Partecipazione.Stato.ANNULLATA)
+        )
+        .annotate(
+            n_partecipanti=Count(
+                "partecipazioni",
+                filter=~Q(partecipazioni__stato=Partecipazione.Stato.ANNULLATA),
+            )
+        )
+        .filter(
+            Q(tipo_lezione__capienza_max__isnull=True)
+            | Q(n_partecipanti__lt=F("tipo_lezione__capienza_max"))
+        )
+        .select_related("tipo_lezione", "istruttore", "campo")
+        .order_by("data", "ora_inizio")
+        .distinct()
+    )
+
+    return render(request, "lezioni/prenota.html", {"lezioni_aperte": lezioni_aperte})
+
+
+@allievo_required
+@richiede_impostazione(_prenotazione_autonoma_attiva, "persone:portale", _MESSAGGIO_FEATURE_DISATTIVA)
+def prenota_conferma(request, pk):
+    if request.method != "POST":
+        return redirect("lezioni:prenota")
+
+    allievo = request.user.allievo
+    with transaction.atomic():
+        lezione = get_object_or_404(Lezione.objects.select_for_update(), pk=pk)
+
+        if lezione.data < timezone.localdate() or lezione.stato == Lezione.Stato.ANNULLATA:
+            messages.error(request, "Questa lezione non è più prenotabile.")
+            return redirect("lezioni:prenota")
+
+        gia_attiva = (
+            Partecipazione.objects.filter(lezione=lezione, allievo=allievo)
+            .exclude(stato=Partecipazione.Stato.ANNULLATA)
+            .exists()
+        )
+        if gia_attiva:
+            messages.info(request, "Sei già iscritto a questa lezione.")
+            return redirect("persone:portale")
+
+        capienza = lezione.tipo_lezione.capienza_max
+        if capienza is not None:
+            n_attivi = lezione.partecipazioni.exclude(stato=Partecipazione.Stato.ANNULLATA).count()
+            if n_attivi >= capienza:
+                messages.error(request, "Questa lezione è nel frattempo diventata al completo.")
+                return redirect("lezioni:prenota")
+
+        Partecipazione.objects.update_or_create(
+            lezione=lezione,
+            allievo=allievo,
+            defaults={"stato": Partecipazione.Stato.PREVISTA, "cavallo": None},
+        )
+
+    messages.success(request, "Prenotazione registrata: il cavallo ti verrà assegnato dalla segreteria.")
+    return redirect("persone:portale")
+
+
+@allievo_required
+@richiede_impostazione(_prenotazione_autonoma_attiva, "persone:portale", _MESSAGGIO_FEATURE_DISATTIVA)
+def annulla_prenotazione(request, pk):
+    if request.method != "POST":
+        return redirect("persone:portale")
+
+    partecipazione = get_object_or_404(Partecipazione, pk=pk, allievo=request.user.allievo)
+    if partecipazione.lezione.data < timezone.localdate():
+        messages.error(request, "Non puoi annullare una lezione già passata.")
+    else:
+        partecipazione.stato = Partecipazione.Stato.ANNULLATA
+        partecipazione.save(update_fields=["stato"])
+        messages.success(request, "Prenotazione annullata.")
+    return redirect("persone:portale")

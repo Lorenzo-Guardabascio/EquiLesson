@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+
+{% block title %}Prenota una lezione - Gestionale maneggio{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-1">Prenota una lezione</h1>
+<p class="text-muted mb-4">
+    Il cavallo ti verrà assegnato dalla segreteria dopo la prenotazione. Puoi
+    annullare in qualsiasi momento dal tuo <a href="{% url 'persone:portale' %}">portale</a>.
+</p>
+
+<ul class="list-group">
+    {% for l in lezioni_aperte %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+            <div>{{ l.data|date:"d/m/Y" }} {{ l.ora_inizio|time:"H:i" }} — {{ l.tipo_lezione }}</div>
+            <div class="text-muted small mt-1">
+                {% if l.istruttore %}Istruttore: {{ l.istruttore }} · {% endif %}
+                {% if l.campo %}Campo: {{ l.campo }} · {% endif %}
+                {% if l.tipo_lezione.capienza_max %}{{ l.n_partecipanti }}/{{ l.tipo_lezione.capienza_max }} posti{% endif %}
+            </div>
+        </div>
+        <form method="post" action="{% url 'lezioni:prenota_conferma' l.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-sm">Prenota</button>
+        </form>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">Nessuna lezione aperta alla prenotazione al momento.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

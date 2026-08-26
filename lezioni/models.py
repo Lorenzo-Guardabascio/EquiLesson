@@ -24,6 +24,17 @@ class TipoLezione(models.Model):
 
     nome = models.CharField(max_length=100)
     durata_default_minuti = models.PositiveIntegerField(default=60)
+    capienza_max = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Capienza massima",
+        help_text=(
+            "Numero massimo di allievi per una lezione di questo tipo. Lasciare "
+            "vuoto per nessun limite. Usata solo per la prenotazione autonoma "
+            "degli allievi dal portale — l'admin può sempre aggiungere partecipanti "
+            "oltre il limite dal form lezione."
+        ),
+    )
     attivo = models.BooleanField(default=True)
 
     class Meta:

@@ -1,26 +1,13 @@
 from datetime import timedelta
-from functools import wraps
 
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.utils import timezone
 
+from core.models import Impostazioni
 from lezioni.models import Partecipazione
 from pacchetti.models import Pacchetto
 
-
-def allievo_required(view_func):
-    """Consente l'accesso solo ad account collegati a un Allievo (portale di sola lettura)."""
-
-    @wraps(view_func)
-    @login_required
-    def wrapper(request, *args, **kwargs):
-        if not hasattr(request.user, "allievo"):
-            raise PermissionDenied("Questo account non è collegato a un allievo.")
-        return view_func(request, *args, **kwargs)
-
-    return wrapper
+from .decorators import allievo_required
 
 
 @allievo_required
@@ -72,4 +59,5 @@ def portale(request):
         "pacchetto_attivo": pacchetto_attivo,
         "pacchetti": pacchetti,
         "scadenze": scadenze,
+        "prenotazione_autonoma_abilitata": Impostazioni.get().prenotazione_autonoma_abilitata,
     })

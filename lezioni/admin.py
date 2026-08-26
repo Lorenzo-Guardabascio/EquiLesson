@@ -23,7 +23,7 @@ class CampoAdmin(admin.ModelAdmin):
 
 @admin.register(TipoLezione)
 class TipoLezioneAdmin(admin.ModelAdmin):
-    list_display = ("nome", "durata_default_minuti", "attivo")
+    list_display = ("nome", "durata_default_minuti", "capienza_max", "attivo")
     list_filter = ("attivo",)
 
 
