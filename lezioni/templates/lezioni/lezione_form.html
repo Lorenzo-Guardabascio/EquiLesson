@@ -1,0 +1,156 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ titolo }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{{ titolo }}</h1>
+    <a href="{% url 'lezioni:calendario' %}" class="btn btn-outline-secondary btn-sm">&larr; Torna al calendario</a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Dati della lezione</h2>
+            <div class="row g-3">
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.data.id_for_label }}">Data</label>
+                    {{ form.data }}
+                    {{ form.data.errors }}
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.ora_inizio.id_for_label }}">Ora inizio</label>
+                    {{ form.ora_inizio }}
+                    {{ form.ora_inizio.errors }}
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.ora_fine.id_for_label }}">Ora fine</label>
+                    {{ form.ora_fine }}
+                    {{ form.ora_fine.errors }}
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.tipo_lezione.id_for_label }}">Tipo di lezione</label>
+                    {{ form.tipo_lezione }}
+                    {{ form.tipo_lezione.errors }}
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.istruttore.id_for_label }}">Istruttore</label>
+                    {{ form.istruttore }}
+                    {{ form.istruttore.errors }}
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.campo.id_for_label }}">Campo</label>
+                    {{ form.campo }}
+                    {{ form.campo.errors }}
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label" for="{{ form.stato.id_for_label }}">Stato</label>
+                    {{ form.stato }}
+                    {{ form.stato.errors }}
+                </div>
+                <div class="col-sm-8">
+                    <label class="form-label" for="{{ form.note.id_for_label }}">Note</label>
+                    {{ form.note }}
+                    {{ form.note.errors }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Partecipanti</h2>
+            {{ formset.management_form }}
+            {% if formset.non_form_errors %}
+            <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+            {% endif %}
+            <div id="partecipazioni-container">
+                {% for pform in formset %}
+                <div class="row g-2 align-items-start border-bottom pb-2 mb-2 partecipazione-row">
+                    {% for hidden in pform.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="col-sm-3">
+                        {% if forloop.first %}<label class="form-label small">Allievo</label>{% endif %}
+                        {{ pform.allievo }}
+                    </div>
+                    <div class="col-sm-3">
+                        {% if forloop.first %}<label class="form-label small">Cavallo</label>{% endif %}
+                        {{ pform.cavallo }}
+                    </div>
+                    <div class="col-sm-2">
+                        {% if forloop.first %}<label class="form-label small">Pacchetto</label>{% endif %}
+                        {{ pform.pacchetto }}
+                    </div>
+                    <div class="col-sm-2">
+                        {% if forloop.first %}<label class="form-label small">Stato</label>{% endif %}
+                        {{ pform.stato }}
+                    </div>
+                    <div class="col-sm-1">
+                        {% if forloop.first %}<label class="form-label small">Note</label>{% endif %}
+                        {{ pform.note }}
+                    </div>
+                    <div class="col-sm-1 d-flex align-items-center" style="height:38px">
+                        {% if pform.instance.pk %}
+                        <div class="form-check">
+                            {{ pform.DELETE }}
+                            <label class="form-check-label small" for="{{ pform.DELETE.id_for_label }}">Rimuovi</label>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {{ pform.errors }}
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="aggiungi-partecipante" class="btn btn-sm btn-outline-secondary mt-2">+ Aggiungi partecipante</button>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salva lezione</button>
+    {% if lezione %}
+    <a href="{% url 'lezioni:lezione_elimina' lezione.pk %}" class="btn btn-outline-danger">Elimina lezione</a>
+    {% endif %}
+</form>
+
+<template id="template-riga-vuota">
+    <div class="row g-2 align-items-start border-bottom pb-2 mb-2 partecipazione-row">
+        {{ formset.empty_form.allievo }}
+        {{ formset.empty_form.cavallo }}
+        {{ formset.empty_form.pacchetto }}
+        {{ formset.empty_form.stato }}
+        {{ formset.empty_form.note }}
+    </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var container = document.getElementById('partecipazioni-container');
+    var totalForms = document.getElementById('id_partecipazioni-TOTAL_FORMS');
+    var btnAggiungi = document.getElementById('aggiungi-partecipante');
+    var template = document.getElementById('template-riga-vuota');
+
+    btnAggiungi.addEventListener('click', function () {
+        var index = parseInt(totalForms.value, 10);
+        var html = template.innerHTML.replace(/__prefix__/g, index);
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = html.trim();
+        var riga = wrapper.firstElementChild;
+        // colonne coerenti con le righe esistenti
+        var cols = riga.querySelectorAll('select, input');
+        var wrappers = ['col-sm-3', 'col-sm-3', 'col-sm-2', 'col-sm-2', 'col-sm-1'];
+        cols.forEach(function (el, i) {
+            var col = document.createElement('div');
+            col.className = wrappers[i] || 'col-sm-2';
+            el.parentNode.insertBefore(col, el);
+            col.appendChild(el);
+        });
+        container.appendChild(riga);
+        totalForms.value = index + 1;
+    });
+});
+</script>
+{% endblock %}

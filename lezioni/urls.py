@@ -7,4 +7,7 @@ app_name = "lezioni"
 urlpatterns = [
     path("calendario/", views.calendario, name="calendario"),
     path("calendario/eventi.json", views.eventi_json, name="eventi_json"),
+    path("nuova/", views.lezione_form, name="lezione_nuova"),
+    path("<int:pk>/modifica/", views.lezione_form, name="lezione_modifica"),
+    path("<int:pk>/elimina/", views.lezione_elimina, name="lezione_elimina"),
 ]

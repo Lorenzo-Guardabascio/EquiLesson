@@ -1,10 +1,13 @@
 from datetime import datetime
 
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from .forms import LezioneForm, PartecipazioneFormSet
 from .models import Lezione
 
 # Colore per stato lezione (esadecimale, usato dal calendario).
@@ -45,7 +48,7 @@ def eventi_json(request):
             "start": f"{lezione.data}T{lezione.ora_inizio}",
             "end": f"{lezione.data}T{lezione.ora_fine}",
             "color": COLORE_STATO.get(lezione.stato, "#6c757d"),
-            "url": reverse("admin:lezioni_lezione_change", args=[lezione.id]),
+            "url": reverse("lezioni:lezione_modifica", args=[lezione.id]),
             "extendedProps": {
                 "campo": str(lezione.campo) if lezione.campo else "",
                 "istruttore": str(lezione.istruttore) if lezione.istruttore else "",
@@ -53,3 +56,40 @@ def eventi_json(request):
             },
         })
     return JsonResponse(eventi, safe=False)
+
+
+@staff_member_required
+def lezione_form(request, pk=None):
+    lezione = get_object_or_404(Lezione, pk=pk) if pk else None
+    titolo = "Modifica lezione" if lezione else "Nuova lezione"
+
+    if request.method == "POST":
+        form = LezioneForm(request.POST, instance=lezione)
+        with transaction.atomic():
+            if form.is_valid():
+                lezione_obj = form.save()
+                formset = PartecipazioneFormSet(request.POST, instance=lezione_obj)
+                if formset.is_valid():
+                    formset.save()
+                    messages.success(request, "Lezione salvata correttamente.")
+                    return redirect("lezioni:calendario")
+                transaction.set_rollback(True)
+            else:
+                formset = PartecipazioneFormSet(request.POST, instance=lezione or Lezione())
+    else:
+        form = LezioneForm(instance=lezione)
+        formset = PartecipazioneFormSet(instance=lezione)
+
+    return render(request, "lezioni/lezione_form.html", {
+        "form": form, "formset": formset, "lezione": lezione, "titolo": titolo,
+    })
+
+
+@staff_member_required
+def lezione_elimina(request, pk):
+    lezione = get_object_or_404(Lezione, pk=pk)
+    if request.method == "POST":
+        lezione.delete()
+        messages.success(request, "Lezione eliminata.")
+        return redirect("lezioni:calendario")
+    return render(request, "lezioni/lezione_conferma_elimina.html", {"lezione": lezione})
