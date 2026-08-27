@@ -1,0 +1,167 @@
+/*
+ * Identità visiva di EquiLesson: sostituisce il blu/grigio di serie di
+ * Bootstrap con una palette calda legata al mondo del maneggio (verde
+ * bosco, carta chiara, dettagli cuoio), e la tipografia di sistema con
+ * una coppia di font con più carattere.
+ *
+ * Bootstrap qui è precompilato (bootstrap.min.css), non ricompilato da
+ * SASS: i colori dei componenti sono valori esadecimali fissi nelle
+ * singole regole (es. .btn-primary{--bs-btn-bg:#0d6efd}), non derivati
+ * da --bs-primary. Per questo il retema qui sotto ridefinisce le
+ * variabili per-componente di ogni classe effettivamente usata nei
+ * template, invece di limitarsi a un'unica variabile globale che non
+ * avrebbe alcun effetto sui componenti già compilati.
+ */
+
+/* --- font auto-ospitati (nessun CDN esterno, come bootstrap/fullcalendar/choices) --- */
+@font-face {
+    font-family: "Libre Franklin";
+    font-style: normal;
+    font-weight: 100 900; /* font variabile: un solo file copre tutto l'asse dei pesi */
+    font-display: swap;
+    src: url("../fonts/libre-franklin-variable.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Public Sans";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../fonts/public-sans-variable.woff2") format("woff2");
+}
+
+:root {
+    --brand: #35533a;         /* verde bosco: azioni primarie, link, nav */
+    --brand-strong: #223a26;  /* hover/active sui controlli primari */
+    --brand-soft: #e7ede4;    /* sfondi tenui (badge, righe attive) */
+    --ink: #262622;           /* testo principale, nero caldo */
+    --ink-soft: #5c5a50;      /* testo secondario/muted */
+    --paper: #f7f6f1;         /* sfondo pagina, bianco caldo */
+    --surface: #ffffff;       /* card/pannelli */
+    --line: #ddd7c8;          /* bordi/separatori, grigio caldo */
+    --rust: #a1552b;          /* accento secondario (uso mirato, non decorativo) */
+
+    --font-display: "Libre Franklin", "Segoe UI", Roboto, Arial, sans-serif;
+    --font-body: "Public Sans", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6,
+.navbar-brand, .card-title, .fs-2 {
+    font-family: var(--font-display);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+a {
+    color: var(--brand);
+}
+a:hover {
+    color: var(--brand-strong);
+}
+
+/* --- navbar: verde bosco invece del nero/grigio di serie --- */
+.navbar-dark.bg-dark {
+    background-color: var(--brand) !important;
+}
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+}
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #fff;
+}
+
+/* --- pulsanti --- */
+.btn {
+    font-family: var(--font-body);
+    font-weight: 600;
+    border-radius: 0.4rem;
+}
+.btn-primary {
+    --bs-btn-bg: var(--brand);
+    --bs-btn-border-color: var(--brand);
+    --bs-btn-hover-bg: var(--brand-strong);
+    --bs-btn-hover-border-color: var(--brand-strong);
+    --bs-btn-active-bg: var(--brand-strong);
+    --bs-btn-active-border-color: var(--brand-strong);
+    --bs-btn-disabled-bg: var(--brand);
+    --bs-btn-disabled-border-color: var(--brand);
+    --bs-btn-focus-shadow-rgb: 53, 83, 58;
+}
+.btn-outline-primary {
+    --bs-btn-color: var(--brand);
+    --bs-btn-border-color: var(--brand);
+    --bs-btn-hover-bg: var(--brand);
+    --bs-btn-hover-border-color: var(--brand);
+    --bs-btn-active-bg: var(--brand);
+    --bs-btn-active-border-color: var(--brand);
+    --bs-btn-disabled-color: var(--brand);
+    --bs-btn-disabled-border-color: var(--brand);
+    --bs-btn-focus-shadow-rgb: 53, 83, 58;
+}
+.btn-outline-secondary {
+    --bs-btn-color: var(--ink-soft);
+    --bs-btn-border-color: var(--line);
+    --bs-btn-hover-bg: var(--ink-soft);
+    --bs-btn-hover-border-color: var(--ink-soft);
+    --bs-btn-active-bg: var(--ink-soft);
+    --bs-btn-active-border-color: var(--ink-soft);
+}
+.btn-outline-light {
+    --bs-btn-hover-color: var(--brand);
+}
+
+/* --- form: focus ring in tinta col brand, non blu --- */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 0.25rem rgba(53, 83, 58, 0.25);
+}
+.form-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* --- card: ombra più quieta, bordo caldo invece che grigio freddo --- */
+.card {
+    border-color: var(--line);
+    box-shadow: 0 1px 3px rgba(38, 38, 34, 0.06);
+}
+.card-title {
+    color: var(--ink);
+}
+
+/* --- tabelle e liste: intestazioni leggibili, righe pulite --- */
+.table {
+    --bs-table-border-color: var(--line);
+}
+.table thead th {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    border-bottom-width: 1px;
+}
+.list-group-item {
+    border-color: var(--line);
+}
+
+/* --- alert: leggermente più caldi dei toni di serie --- */
+.alert-light {
+    background-color: var(--brand-soft);
+    border-color: var(--line);
+    color: var(--ink);
+}
+
+/* --- footer discreto --- */
+footer {
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+}
