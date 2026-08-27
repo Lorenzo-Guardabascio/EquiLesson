@@ -37,11 +37,12 @@ restart of the process — plain autoreload isn't enough.
 - `python manage.py carica_dati_demo` — loads placeholder data (students,
   horses, instructors, arenas, lessons...). Safe to run again without
   duplicating data.
-- `python manage.py imposta_ruoli` — creates/updates the Instructors/Students
-  groups and creates missing login accounts (instructors get limited admin
-  access, students get access to the read-only portal only). Generated
-  passwords are printed once and never saved anywhere: pass them on right
-  away, they can't be recovered later.
+- `python manage.py imposta_ruoli` — creates/updates the Instructors/Front desk/
+  Students/Owners groups and creates missing login accounts for instructors,
+  students and owners (Front desk has no dedicated person model, so those
+  accounts are created by hand from the technical admin — see "Roles and
+  access" below). Generated passwords are printed once and never saved
+  anywhere: pass them on right away, they can't be recovered later.
 - `python manage.py invia_notifiche` — sends lesson reminders (the day
   before) and expiry alerts (medical certificate, federation membership
   cards, lesson package) within 30 days. Meant to run once a day via cron:
@@ -73,7 +74,8 @@ DEFAULT_FROM_EMAIL=...
 ## Telegram and WhatsApp notifications
 
 Both are optional, additive channels on top of email, each with its own
-on/off switch in `/admin/core/impostazioni/` (both off by default):
+on/off switch in Settings (`/impostazioni/` in the app, front desk access,
+both off by default):
 
 - **Telegram** is fully implemented: create a bot with
   [@BotFather](https://t.me/BotFather), put the token in `TELEGRAM_BOT_TOKEN`
@@ -88,16 +90,33 @@ on/off switch in `/admin/core/impostazioni/` (both off by default):
 
 ## Roles and access
 
-- **Admin/front desk** (superuser): full access, including `/admin/`.
+Day-to-day work happens entirely in the app frontend, under the "Manage"
+menu — `/admin/` is a technical panel reserved for whoever administers the
+installation (see below), not part of anyone else's regular workflow.
+
+- **Sysadmin** (superuser, `is_superuser=True`): the only role with access to
+  `/admin/` — Django's own admin, used for one-off technical operations
+  (creating accounts, fixing data by hand, inspecting notification logs),
+  not for daily use.
+- **Front desk** ("Front desk" group, `is_staff=True`, no dedicated person
+  model — the sysadmin creates these accounts by hand in `/admin/`, ticking
+  `is_staff` and assigning the group): full read/write access from the
+  frontend "Manage" menu to students, guardians, instructors, owners,
+  horses, packages, arenas, lesson types, broadcast communications and
+  settings, plus the lesson calendar/form (which only requires
+  `is_staff`, no extra permission).
 - **Instructors** ("Instructors" group, `is_staff=True`): full management of
-  lessons/participations, read-only on students/horses/arenas/packages, no
-  access to restricted documents (certificates, sensitive data).
+  lessons/participations, read-only on students/horses/arenas/packages from
+  the same "Manage" menu (the menu only shows what the group's Django
+  permissions allow — same permission system as the front desk, just
+  narrower), no access to restricted documents (certificates, sensitive
+  data).
 - **Students/parents** ("Students" group, `is_staff=False`): no admin
   access, a portal at `/persone/portale/` with their own lessons and
-  package status. If the administrator turns on "Self-booking" (in
-  `/admin/core/impostazioni/`, **off by default**), they can also
-  book/cancel their own participation in lessons with open spots — the
-  horse is still assigned by the front desk.
+  package status. If the front desk turns on "Self-booking" (in
+  `/impostazioni/`, **off by default**), they can also book/cancel their
+  own participation in lessons with open spots — the horse is still
+  assigned by the front desk.
 
 ## Apps
 
@@ -265,11 +284,13 @@ serve un riavvio pulito del processo, non basta l'autoreload.
 
 - `python manage.py carica_dati_demo` — popola dati placeholder (allievi,
   cavalli, istruttori, campi, lezioni...). Rilanciabile senza duplicare.
-- `python manage.py imposta_ruoli` — crea/aggiorna i gruppi Istruttori/Allievi
-  e crea gli account di accesso mancanti (istruttori con accesso admin
-  limitato, allievi con accesso al solo portale di sola lettura). Le password
-  generate vengono stampate una volta sola, non salvate da nessuna parte:
-  vanno comunicate subito e non sono recuperabili in seguito.
+- `python manage.py imposta_ruoli` — crea/aggiorna i gruppi Istruttori/
+  Segreteria/Allievi/Proprietari e crea gli account di accesso mancanti per
+  istruttori, allievi e proprietari (la Segreteria non ha un modello
+  anagrafico proprio, quegli account li crea a mano il sistemista
+  dall'admin tecnico — vedi "Ruoli e accesso"). Le password generate
+  vengono stampate una volta sola, non salvate da nessuna parte: vanno
+  comunicate subito e non sono recuperabili in seguito.
 - `python manage.py invia_notifiche` — invia i promemoria lezione (il giorno
   prima) e gli alert di scadenza (certificato medico, tessere FISE/FITETREK,
   pacchetto) entro 30 giorni. Pensato per girare una volta al giorno da cron:
@@ -302,8 +323,8 @@ DEFAULT_FROM_EMAIL=...
 ## Notifiche Telegram e WhatsApp
 
 Entrambi sono canali opzionali e aggiuntivi rispetto all'email, ciascuno con
-il proprio interruttore in `/admin/core/impostazioni/` (entrambi disattivati
-di default):
+il proprio interruttore in Impostazioni (`/impostazioni/` nell'app, accesso
+segreteria, entrambi disattivati di default):
 
 - **Telegram** è pienamente funzionante: crea un bot con
   [@BotFather](https://t.me/BotFather), metti il token in
@@ -319,14 +340,31 @@ di default):
 
 ## Ruoli e accesso
 
-- **Admin/segreteria** (superuser): accesso completo, incluso `/admin/`.
+Il lavoro quotidiano si svolge interamente nel frontend, nel menu "Gestione"
+— `/admin/` è un pannello tecnico riservato a chi amministra l'installazione
+(vedi sotto), non fa parte del flusso di lavoro di nessun altro ruolo.
+
+- **Sistemista** (superuser, `is_superuser=True`): unico ruolo con accesso a
+  `/admin/` — l'admin di Django, per operazioni tecniche una tantum (creare
+  account, correggere dati a mano, consultare i log delle notifiche), non
+  per l'uso quotidiano.
+- **Segreteria** (gruppo "Segreteria", `is_staff=True`, nessun modello
+  anagrafico proprio — è il sistemista a creare questi account a mano in
+  `/admin/`, spuntando `is_staff` e assegnando il gruppo): accesso completo
+  in lettura/scrittura dal menu "Gestione" del frontend ad allievi, tutori,
+  istruttori, proprietari, cavalli, pacchetti, campi, tipi di lezione,
+  comunicazioni broadcast e impostazioni, oltre al calendario/form lezioni
+  (che richiede solo `is_staff`, nessun permesso aggiuntivo).
 - **Istruttori** (gruppo "Istruttori", `is_staff=True`): gestione completa di
-  lezioni/partecipazioni, sola lettura su allievi/cavalli/campi/pacchetti,
-  nessun accesso ai documenti riservati (certificati, dati sensibili).
+  lezioni/partecipazioni, sola lettura su allievi/cavalli/campi/pacchetti
+  dallo stesso menu "Gestione" (il menu mostra solo quello che i permessi
+  Django del gruppo consentono — stesso sistema di permessi della
+  segreteria, solo più ristretto), nessun accesso ai documenti riservati
+  (certificati, dati sensibili).
 - **Allievi/genitori** (gruppo "Allievi", `is_staff=False`): nessun accesso
   admin, portale in `/persone/portale/` con le proprie lezioni e lo stato
-  del pacchetto. Se l'amministratore attiva l'opzione "Prenotazione autonoma"
-  (in `/admin/core/impostazioni/`, **disattivata di default**), possono anche
+  del pacchetto. Se la segreteria attiva l'opzione "Prenotazione autonoma"
+  (in `/impostazioni/`, **disattivata di default**), possono anche
   prenotare/annullare da soli la propria partecipazione a lezioni con posti
   liberi — il cavallo resta comunque assegnato dalla segreteria.
 
