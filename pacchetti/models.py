@@ -77,4 +77,12 @@ class Pacchetto(models.Model):
 
     @property
     def lezioni_residue(self):
-        return max(self.lezioni_totali - self.lezioni_utilizzate, 0)
+        """Può essere negativo: un allievo che fa una lezione in più di quelle
+        pagate deve risultare "in debito" (es. -1), non azzerato a 0 come se
+        fosse tutto regolare — altrimenti lo sforamento resta invisibile e
+        nessuno se ne accorge finché non è tardi."""
+        return self.lezioni_totali - self.lezioni_utilizzate
+
+    @property
+    def in_debito(self):
+        return self.lezioni_residue < 0

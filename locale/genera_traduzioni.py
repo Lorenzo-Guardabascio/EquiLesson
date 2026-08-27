@@ -70,6 +70,7 @@ TRADUZIONI = {
     "Istruttore": "Instructor",
     "L'accettazione viene registrata con data/ora e indirizzo IP, insieme al testo esatto mostrato qui sopra.": "Acceptance is recorded with date/time and IP address, along with the exact text shown above.",
     "La mia tessera": "My membership card",
+    "Lezioni svolte oltre a quelle incluse nel pacchetto.": "Lessons taken beyond what's included in the package.",
     "Le mie lezioni": "My lessons",
     "Lezioni": "Lessons",
     "Lezioni oggi": "Lessons today",

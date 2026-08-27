@@ -166,6 +166,9 @@ msgstr ""
 msgid "La mia tessera"
 msgstr "My membership card"
 
+msgid "Lezioni svolte oltre a quelle incluse nel pacchetto."
+msgstr "Lessons taken beyond what's included in the package."
+
 msgid "Le mie lezioni"
 msgstr "My lessons"
 

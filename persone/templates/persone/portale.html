@@ -33,7 +33,10 @@
                 <h2 class="h5 card-title">{% trans "Il mio pacchetto" %}</h2>
                 {% if pacchetto_attivo %}
                 <p class="mb-1">{{ pacchetto_attivo.tipo_pacchetto.nome }}</p>
-                <div class="fs-2 fw-bold">{{ pacchetto_attivo.lezioni_residue }} <span class="fs-6 text-muted">/ {% blocktrans with tot=pacchetto_attivo.lezioni_totali %}{{ tot }} lezioni residue{% endblocktrans %}</span></div>
+                <div class="fs-2 fw-bold {% if pacchetto_attivo.in_debito %}text-danger{% endif %}">{{ pacchetto_attivo.lezioni_residue }} <span class="fs-6 text-muted">/ {% blocktrans with tot=pacchetto_attivo.lezioni_totali %}{{ tot }} lezioni residue{% endblocktrans %}</span></div>
+                {% if pacchetto_attivo.in_debito %}
+                <p class="text-danger small mb-1">{% trans "Lezioni svolte oltre a quelle incluse nel pacchetto." %}</p>
+                {% endif %}
                 <p class="text-muted mb-0">{% blocktrans with data=pacchetto_attivo.data_scadenza|date:"d/m/Y" %}Valido fino al {{ data }}{% endblocktrans %}</p>
                 {% else %}
                 <p class="text-muted mb-0">{% trans "Nessun pacchetto attivo al momento." %}</p>
@@ -50,7 +53,7 @@
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                         <span>{{ p.tipo_pacchetto.nome }} — {% blocktrans with dal=p.data_inizio|date:"d/m/Y" al=p.data_scadenza|date:"d/m/Y" %}dal {{ dal }} al {{ al }}{% endblocktrans %}</span>
                         <span class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">{% blocktrans with res=p.lezioni_residue tot=p.lezioni_totali %}{{ res }}/{{ tot }} residue{% endblocktrans %}</span>
+                            <span class="small {% if p.in_debito %}text-danger fw-bold{% else %}text-muted{% endif %}">{% blocktrans with res=p.lezioni_residue tot=p.lezioni_totali %}{{ res }}/{{ tot }} residue{% endblocktrans %}</span>
                             <span class="badge text-bg-secondary">{{ p.get_stato_display }}</span>
                         </span>
                     </li>
