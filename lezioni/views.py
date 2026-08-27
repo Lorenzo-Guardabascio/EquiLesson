@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _lazy
 
 from core.decorators import richiede_impostazione
 from core.models import Impostazioni
@@ -77,7 +79,7 @@ def lezione_form(request, pk=None):
                 formset = PartecipazioneFormSet(request.POST, instance=lezione_obj)
                 if formset.is_valid():
                     formset.save()
-                    messages.success(request, "Lezione salvata correttamente.")
+                    messages.success(request, _("Lezione salvata correttamente."))
                     return redirect("lezioni:calendario")
                 transaction.set_rollback(True)
             else:
@@ -96,7 +98,7 @@ def lezione_elimina(request, pk):
     lezione = get_object_or_404(Lezione, pk=pk)
     if request.method == "POST":
         lezione.delete()
-        messages.success(request, "Lezione eliminata.")
+        messages.success(request, _("Lezione eliminata."))
         return redirect("lezioni:calendario")
     return render(request, "lezioni/lezione_conferma_elimina.html", {"lezione": lezione})
 
@@ -105,7 +107,7 @@ def _prenotazione_autonoma_attiva():
     return Impostazioni.get().prenotazione_autonoma_abilitata
 
 
-_MESSAGGIO_FEATURE_DISATTIVA = "La prenotazione autonoma non è attiva al momento: contatta la segreteria."
+_MESSAGGIO_FEATURE_DISATTIVA = _lazy("La prenotazione autonoma non è attiva al momento: contatta la segreteria.")
 
 
 @allievo_required
@@ -151,7 +153,7 @@ def prenota_conferma(request, pk):
         lezione = get_object_or_404(Lezione.objects.select_for_update(), pk=pk)
 
         if lezione.data < timezone.localdate() or lezione.stato == Lezione.Stato.ANNULLATA:
-            messages.error(request, "Questa lezione non è più prenotabile.")
+            messages.error(request, _("Questa lezione non è più prenotabile."))
             return redirect("lezioni:prenota")
 
         gia_attiva = (
@@ -160,14 +162,14 @@ def prenota_conferma(request, pk):
             .exists()
         )
         if gia_attiva:
-            messages.info(request, "Sei già iscritto a questa lezione.")
+            messages.info(request, _("Sei già iscritto a questa lezione."))
             return redirect("persone:portale")
 
         capienza = lezione.tipo_lezione.capienza_max
         if capienza is not None:
             n_attivi = lezione.partecipazioni.exclude(stato=Partecipazione.Stato.ANNULLATA).count()
             if n_attivi >= capienza:
-                messages.error(request, "Questa lezione è nel frattempo diventata al completo.")
+                messages.error(request, _("Questa lezione è nel frattempo diventata al completo."))
                 return redirect("lezioni:prenota")
 
         Partecipazione.objects.update_or_create(
@@ -176,7 +178,7 @@ def prenota_conferma(request, pk):
             defaults={"stato": Partecipazione.Stato.PREVISTA, "cavallo": None},
         )
 
-    messages.success(request, "Prenotazione registrata: il cavallo ti verrà assegnato dalla segreteria.")
+    messages.success(request, _("Prenotazione registrata: il cavallo ti verrà assegnato dalla segreteria."))
     return redirect("persone:portale")
 
 
@@ -188,9 +190,9 @@ def annulla_prenotazione(request, pk):
 
     partecipazione = get_object_or_404(Partecipazione, pk=pk, allievo=request.user.allievo)
     if partecipazione.lezione.data < timezone.localdate():
-        messages.error(request, "Non puoi annullare una lezione già passata.")
+        messages.error(request, _("Non puoi annullare una lezione già passata."))
     else:
         partecipazione.stato = Partecipazione.Stato.ANNULLATA
         partecipazione.save(update_fields=["stato"])
-        messages.success(request, "Prenotazione annullata.")
+        messages.success(request, _("Prenotazione annullata."))
     return redirect("persone:portale")

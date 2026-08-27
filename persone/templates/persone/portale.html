@@ -1,14 +1,15 @@
 {% extends "core/base.html" %}
+{% load i18n %}
 
-{% block title %}Il mio portale - Gestionale maneggio{% endblock %}
+{% block title %}{% trans "Il mio portale" %} - {% trans "Gestionale maneggio" %}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
-    <h1 class="h3 mb-0">Ciao, {{ allievo.nome }}</h1>
+    <h1 class="h3 mb-0">{% blocktrans with nome=allievo.nome %}Ciao, {{ nome }}{% endblocktrans %}</h1>
     <div class="d-flex gap-2">
-        <a href="{% url 'persone:tessera' %}" class="btn btn-outline-secondary btn-sm">La mia tessera</a>
+        <a href="{% url 'persone:tessera' %}" class="btn btn-outline-secondary btn-sm">{% trans "La mia tessera" %}</a>
         {% if prenotazione_autonoma_abilitata %}
-        <a href="{% url 'lezioni:prenota' %}" class="btn btn-primary btn-sm">+ Prenota una lezione</a>
+        <a href="{% url 'lezioni:prenota' %}" class="btn btn-primary btn-sm">+ {% trans "Prenota una lezione" %}</a>
         {% endif %}
     </div>
 </div>
@@ -18,7 +19,7 @@
     {% for s in scadenze %}
     <div class="col-md-4">
         <div class="alert {% if s.urgente %}alert-warning{% else %}alert-light border{% endif %} mb-0 py-2 px-3">
-            <strong>{{ s.etichetta }}</strong>: scade il {{ s.scadenza|date:"d/m/Y" }}
+            <strong>{{ s.etichetta }}</strong>: {% blocktrans with data=s.scadenza|date:"d/m/Y" %}scade il {{ data }}{% endblocktrans %}
         </div>
     </div>
     {% endfor %}
@@ -29,13 +30,13 @@
     <div class="col-lg-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Il mio pacchetto</h2>
+                <h2 class="h5 card-title">{% trans "Il mio pacchetto" %}</h2>
                 {% if pacchetto_attivo %}
                 <p class="mb-1">{{ pacchetto_attivo.tipo_pacchetto.nome }}</p>
-                <div class="fs-2 fw-bold">{{ pacchetto_attivo.lezioni_residue }} <span class="fs-6 text-muted">/ {{ pacchetto_attivo.lezioni_totali }} lezioni residue</span></div>
-                <p class="text-muted mb-0">Valido fino al {{ pacchetto_attivo.data_scadenza|date:"d/m/Y" }}</p>
+                <div class="fs-2 fw-bold">{{ pacchetto_attivo.lezioni_residue }} <span class="fs-6 text-muted">/ {% blocktrans with tot=pacchetto_attivo.lezioni_totali %}{{ tot }} lezioni residue{% endblocktrans %}</span></div>
+                <p class="text-muted mb-0">{% blocktrans with data=pacchetto_attivo.data_scadenza|date:"d/m/Y" %}Valido fino al {{ data }}{% endblocktrans %}</p>
                 {% else %}
-                <p class="text-muted mb-0">Nessun pacchetto attivo al momento.</p>
+                <p class="text-muted mb-0">{% trans "Nessun pacchetto attivo al momento." %}</p>
                 {% endif %}
             </div>
         </div>
@@ -43,18 +44,18 @@
     <div class="col-lg-8">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Storico pacchetti</h2>
+                <h2 class="h5 card-title">{% trans "Storico pacchetti" %}</h2>
                 <ul class="list-group list-group-flush">
                     {% for p in pacchetti %}
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span>{{ p.tipo_pacchetto.nome }} — dal {{ p.data_inizio|date:"d/m/Y" }} al {{ p.data_scadenza|date:"d/m/Y" }}</span>
+                        <span>{{ p.tipo_pacchetto.nome }} — {% blocktrans with dal=p.data_inizio|date:"d/m/Y" al=p.data_scadenza|date:"d/m/Y" %}dal {{ dal }} al {{ al }}{% endblocktrans %}</span>
                         <span class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">{{ p.lezioni_residue }}/{{ p.lezioni_totali }} residue</span>
+                            <span class="text-muted small">{% blocktrans with res=p.lezioni_residue tot=p.lezioni_totali %}{{ res }}/{{ tot }} residue{% endblocktrans %}</span>
                             <span class="badge text-bg-secondary">{{ p.get_stato_display }}</span>
                         </span>
                     </li>
                     {% empty %}
-                    <li class="list-group-item px-0 text-muted">Nessun pacchetto registrato.</li>
+                    <li class="list-group-item px-0 text-muted">{% trans "Nessun pacchetto registrato." %}</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -64,7 +65,7 @@
 
 <div class="row g-4">
     <div class="col-lg-6">
-        <h2 class="h5">Prossime lezioni</h2>
+        <h2 class="h5">{% trans "Prossime lezioni" %}</h2>
         <ul class="list-group">
             {% for p in partecipazioni_future %}
             <li class="list-group-item">
@@ -73,24 +74,24 @@
                     <span class="badge text-bg-secondary">{{ p.lezione.get_stato_display }}</span>
                 </div>
                 <div class="text-muted small mt-1">
-                    {% if p.cavallo %}Cavallo: {{ p.cavallo }} · {% endif %}
-                    {% if p.lezione.istruttore %}Istruttore: {{ p.lezione.istruttore }} · {% endif %}
-                    {% if p.lezione.campo %}Campo: {{ p.lezione.campo }}{% endif %}
+                    {% if p.cavallo %}{% trans "Cavallo" %}: {{ p.cavallo }} · {% endif %}
+                    {% if p.lezione.istruttore %}{% trans "Istruttore" %}: {{ p.lezione.istruttore }} · {% endif %}
+                    {% if p.lezione.campo %}{% trans "Campo" %}: {{ p.lezione.campo }}{% endif %}
                 </div>
                 {% if prenotazione_autonoma_abilitata %}
                 <form method="post" action="{% url 'lezioni:annulla_prenotazione' p.pk %}" class="mt-2">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Annulla</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm">{% trans "Annulla" %}</button>
                 </form>
                 {% endif %}
             </li>
             {% empty %}
-            <li class="list-group-item text-muted">Nessuna lezione in programma.</li>
+            <li class="list-group-item text-muted">{% trans "Nessuna lezione in programma." %}</li>
             {% endfor %}
         </ul>
     </div>
     <div class="col-lg-6">
-        <h2 class="h5">Lezioni passate (ultime 10)</h2>
+        <h2 class="h5">{% trans "Lezioni passate (ultime 10)" %}</h2>
         <ul class="list-group">
             {% for p in partecipazioni_passate %}
             <li class="list-group-item">
@@ -99,11 +100,11 @@
                     <span class="badge {% if p.stato == 'assente' %}text-bg-danger{% elif p.stato == 'svolta' %}text-bg-success{% else %}text-bg-secondary{% endif %}">{{ p.get_stato_display }}</span>
                 </div>
                 <div class="text-muted small mt-1">
-                    {% if p.cavallo %}Cavallo: {{ p.cavallo }}{% endif %}
+                    {% if p.cavallo %}{% trans "Cavallo" %}: {{ p.cavallo }}{% endif %}
                 </div>
             </li>
             {% empty %}
-            <li class="list-group-item text-muted">Nessuna lezione passata registrata.</li>
+            <li class="list-group-item text-muted">{% trans "Nessuna lezione passata registrata." %}</li>
             {% endfor %}
         </ul>
     </div>
@@ -112,26 +113,26 @@
 {% if telegram_abilitato %}
 <div class="card shadow-sm mt-4">
     <div class="card-body">
-        <h2 class="h5 card-title">Notifiche su Telegram</h2>
+        <h2 class="h5 card-title">{% trans "Notifiche su Telegram" %}</h2>
         {% if telegram_link.collegato %}
-        <p class="text-success mb-2">✅ Telegram collegato: riceverai qui promemoria e avvisi.</p>
+        <p class="text-success mb-2">✅ {% trans "Telegram collegato: riceverai qui promemoria e avvisi." %}</p>
         <form method="post" action="{% url 'persone:telegram_scollega' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-outline-secondary btn-sm">Scollega</button>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">{% trans "Scollega" %}</button>
         </form>
         {% elif telegram_link.codice_collegamento %}
         <p class="mb-2">
-            Apri
-            {% if telegram_bot_username %}<a href="https://t.me/{{ telegram_bot_username }}" target="_blank" rel="noopener">il bot Telegram del centro</a>{% else %}il bot Telegram del centro{% endif %}
-            e invia questo messaggio:
+            {% trans "Apri" %}
+            {% if telegram_bot_username %}<a href="https://t.me/{{ telegram_bot_username }}" target="_blank" rel="noopener">{% trans "il bot Telegram del centro" %}</a>{% else %}{% trans "il bot Telegram del centro" %}{% endif %}
+            {% trans "e invia questo messaggio:" %}
         </p>
         <p><code>/link {{ telegram_link.codice_collegamento }}</code></p>
-        <p class="text-muted small mb-0">Il collegamento avviene entro qualche minuto dall'invio.</p>
+        <p class="text-muted small mb-0">{% trans "Il collegamento avviene entro qualche minuto dall'invio." %}</p>
         {% else %}
-        <p class="text-muted mb-2">Ricevi i promemoria delle lezioni e gli alert di scadenza anche su Telegram.</p>
+        <p class="text-muted mb-2">{% trans "Ricevi i promemoria delle lezioni e gli alert di scadenza anche su Telegram." %}</p>
         <form method="post" action="{% url 'persone:telegram_genera_codice' %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-outline-primary btn-sm">Genera codice di collegamento</button>
+            <button type="submit" class="btn btn-outline-primary btn-sm">{% trans "Genera codice di collegamento" %}</button>
         </form>
         {% endif %}
     </div>
@@ -140,28 +141,28 @@
 
 <div class="card shadow-sm mt-4">
     <div class="card-body">
-        <h2 class="h5 card-title">Consensi</h2>
+        <h2 class="h5 card-title">{% trans "Consensi" %}</h2>
         {% for c in consensi %}
         <div class="border-bottom pb-3 mb-3">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                 <strong>{{ c.etichetta }}</strong>
                 {% if c.dato %}
-                <span class="badge text-bg-success">Accettato{% if c.ultimo %} il {{ c.ultimo.accettato_il|date:"d/m/Y" }}{% endif %}</span>
+                <span class="badge text-bg-success">{% trans "Accettato" %}{% if c.ultimo %} {% blocktrans with data=c.ultimo.accettato_il|date:"d/m/Y" %}il {{ data }}{% endblocktrans %}{% endif %}</span>
                 {% else %}
-                <span class="badge text-bg-secondary">Non ancora accettato</span>
+                <span class="badge text-bg-secondary">{% trans "Non ancora accettato" %}</span>
                 {% endif %}
             </div>
             <p class="text-muted small mt-2 mb-2">{{ c.testo }}</p>
             {% if not c.dato %}
             <form method="post" action="{% url 'persone:accetta_consenso' c.tipo %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-primary">Accetto</button>
+                <button type="submit" class="btn btn-sm btn-primary">{% trans "Accetto" %}</button>
             </form>
             {% endif %}
         </div>
         {% endfor %}
         <p class="text-muted small mb-0">
-            L'accettazione viene registrata con data/ora e indirizzo IP, insieme al testo esatto mostrato qui sopra.
+            {% trans "L'accettazione viene registrata con data/ora e indirizzo IP, insieme al testo esatto mostrato qui sopra." %}
         </p>
     </div>
 </div>

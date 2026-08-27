@@ -1,5 +1,5 @@
 {% extends "core/base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ titolo }}{% endblock %}
 
@@ -15,7 +15,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">{{ titolo }}</h1>
-    <a href="{% url 'lezioni:calendario' %}" class="btn btn-outline-secondary btn-sm">&larr; Torna al calendario</a>
+    <a href="{% url 'lezioni:calendario' %}" class="btn btn-outline-secondary btn-sm">&larr; {% trans "Torna al calendario" %}</a>
 </div>
 
 <form method="post" novalidate>
@@ -27,45 +27,45 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h2 class="h5 mb-3">Dati della lezione</h2>
+            <h2 class="h5 mb-3">{% trans "Dati della lezione" %}</h2>
             <div class="row g-3">
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.data.id_for_label }}">Data</label>
+                    <label class="form-label" for="{{ form.data.id_for_label }}">{% trans "Data" %}</label>
                     {{ form.data }}
                     {{ form.data.errors }}
                 </div>
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.ora_inizio.id_for_label }}">Ora inizio</label>
+                    <label class="form-label" for="{{ form.ora_inizio.id_for_label }}">{% trans "Ora inizio" %}</label>
                     {{ form.ora_inizio }}
                     {{ form.ora_inizio.errors }}
                 </div>
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.ora_fine.id_for_label }}">Ora fine</label>
+                    <label class="form-label" for="{{ form.ora_fine.id_for_label }}">{% trans "Ora fine" %}</label>
                     {{ form.ora_fine }}
                     {{ form.ora_fine.errors }}
                 </div>
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.tipo_lezione.id_for_label }}">Tipo di lezione</label>
+                    <label class="form-label" for="{{ form.tipo_lezione.id_for_label }}">{% trans "Tipo di lezione" %}</label>
                     {{ form.tipo_lezione }}
                     {{ form.tipo_lezione.errors }}
                 </div>
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.istruttore.id_for_label }}">Istruttore</label>
+                    <label class="form-label" for="{{ form.istruttore.id_for_label }}">{% trans "Istruttore" %}</label>
                     {{ form.istruttore }}
                     {{ form.istruttore.errors }}
                 </div>
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.campo.id_for_label }}">Campo</label>
+                    <label class="form-label" for="{{ form.campo.id_for_label }}">{% trans "Campo" %}</label>
                     {{ form.campo }}
                     {{ form.campo.errors }}
                 </div>
                 <div class="col-sm-4">
-                    <label class="form-label" for="{{ form.stato.id_for_label }}">Stato</label>
+                    <label class="form-label" for="{{ form.stato.id_for_label }}">{% trans "Stato" %}</label>
                     {{ form.stato }}
                     {{ form.stato.errors }}
                 </div>
                 <div class="col-sm-8">
-                    <label class="form-label" for="{{ form.note.id_for_label }}">Note</label>
+                    <label class="form-label" for="{{ form.note.id_for_label }}">{% trans "Note" %}</label>
                     {{ form.note }}
                     {{ form.note.errors }}
                 </div>
@@ -75,7 +75,7 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h2 class="h5 mb-3">Partecipanti</h2>
+            <h2 class="h5 mb-3">{% trans "Partecipanti" %}</h2>
             {{ formset.management_form }}
             {% if formset.non_form_errors %}
             <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
@@ -85,30 +85,30 @@
                 <div class="row g-2 align-items-start border-bottom pb-2 mb-2 partecipazione-row">
                     {% for hidden in pform.hidden_fields %}{{ hidden }}{% endfor %}
                     <div class="col-sm-3">
-                        {% if forloop.first %}<label class="form-label small">Allievo</label>{% endif %}
+                        {% if forloop.first %}<label class="form-label small">{% trans "Allievo" %}</label>{% endif %}
                         {{ pform.allievo }}
                     </div>
                     <div class="col-sm-3">
-                        {% if forloop.first %}<label class="form-label small">Cavallo</label>{% endif %}
+                        {% if forloop.first %}<label class="form-label small">{% trans "Cavallo" %}</label>{% endif %}
                         {{ pform.cavallo }}
                     </div>
                     <div class="col-sm-2">
-                        {% if forloop.first %}<label class="form-label small">Pacchetto</label>{% endif %}
+                        {% if forloop.first %}<label class="form-label small">{% trans "Pacchetto" %}</label>{% endif %}
                         {{ pform.pacchetto }}
                     </div>
                     <div class="col-sm-2">
-                        {% if forloop.first %}<label class="form-label small">Stato</label>{% endif %}
+                        {% if forloop.first %}<label class="form-label small">{% trans "Stato" %}</label>{% endif %}
                         {{ pform.stato }}
                     </div>
                     <div class="col-sm-1">
-                        {% if forloop.first %}<label class="form-label small">Note</label>{% endif %}
+                        {% if forloop.first %}<label class="form-label small">{% trans "Note" %}</label>{% endif %}
                         {{ pform.note }}
                     </div>
                     <div class="col-sm-1 d-flex align-items-center" style="height:38px">
                         {% if pform.instance.pk %}
                         <div class="form-check">
                             {{ pform.DELETE }}
-                            <label class="form-check-label small" for="{{ pform.DELETE.id_for_label }}">Rimuovi</label>
+                            <label class="form-check-label small" for="{{ pform.DELETE.id_for_label }}">{% trans "Rimuovi" %}</label>
                         </div>
                         {% endif %}
                     </div>
@@ -116,13 +116,13 @@
                 </div>
                 {% endfor %}
             </div>
-            <button type="button" id="aggiungi-partecipante" class="btn btn-sm btn-outline-secondary mt-2">+ Aggiungi partecipante</button>
+            <button type="button" id="aggiungi-partecipante" class="btn btn-sm btn-outline-secondary mt-2">+ {% trans "Aggiungi partecipante" %}</button>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Salva lezione</button>
+    <button type="submit" class="btn btn-primary">{% trans "Salva lezione" %}</button>
     {% if lezione %}
-    <a href="{% url 'lezioni:lezione_elimina' lezione.pk %}" class="btn btn-outline-danger">Elimina lezione</a>
+    <a href="{% url 'lezioni:lezione_elimina' lezione.pk %}" class="btn btn-outline-danger">{% trans "Elimina lezione" %}</a>
     {% endif %}
 </form>
 
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
             shouldSort: false,
             allowHTML: false,
             placeholder: true,
-            placeholderValue: '— seleziona —',
+            placeholderValue: '— {% trans "seleziona" %} —',
         });
         istanzeChoices.set(el, istanza);
         return istanza;

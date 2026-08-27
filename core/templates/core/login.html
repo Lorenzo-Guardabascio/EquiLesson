@@ -1,26 +1,27 @@
 {% extends "core/base.html" %}
+{% load i18n %}
 
-{% block title %}Accedi - Gestionale maneggio{% endblock %}
+{% block title %}{% trans "Accedi" %} - {% trans "Gestionale maneggio" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-5">
-        <h1 class="h4 mb-4">Accedi</h1>
+        <h1 class="h4 mb-4">{% trans "Accedi" %}</h1>
         {% if form.errors %}
-        <div class="alert alert-danger">Nome utente o password non corretti.</div>
+        <div class="alert alert-danger">{% trans "Nome utente o password non corretti." %}</div>
         {% endif %}
         <form method="post">
             {% csrf_token %}
             <div class="mb-3">
-                <label class="form-label" for="{{ form.username.id_for_label }}">Nome utente</label>
+                <label class="form-label" for="{{ form.username.id_for_label }}">{% trans "Nome utente" %}</label>
                 {{ form.username }}
             </div>
             <div class="mb-3">
-                <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+                <label class="form-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
                 {{ form.password }}
             </div>
             <input type="hidden" name="next" value="{{ next }}">
-            <button type="submit" class="btn btn-primary w-100">Accedi</button>
+            <button type="submit" class="btn btn-primary w-100">{% trans "Accedi" %}</button>
         </form>
     </div>
 </div>

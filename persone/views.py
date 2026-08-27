@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from comunicazioni.models import TelegramLink
 from core.models import Impostazioni
@@ -127,7 +128,7 @@ def accetta_consenso(request, tipo):
     setattr(allievo, campo_booleano, True)
     allievo.save(update_fields=[campo_booleano])
 
-    messages.success(request, "Consenso registrato.")
+    messages.success(request, _("Consenso registrato."))
     return redirect("persone:portale")
 
 
@@ -140,7 +141,7 @@ def telegram_genera_codice(request):
     if not link.collegato:
         link.codice_collegamento = _genera_codice_telegram()
         link.save(update_fields=["codice_collegamento"])
-        messages.success(request, "Codice generato: invialo al bot Telegram come indicato qui sotto.")
+        messages.success(request, _("Codice generato: invialo al bot Telegram come indicato qui sotto."))
     return redirect("persone:portale")
 
 
@@ -151,7 +152,7 @@ def telegram_scollega(request):
     TelegramLink.objects.filter(allievo=request.user.allievo).update(
         chat_id="", codice_collegamento="", collegato_il=None
     )
-    messages.success(request, "Telegram scollegato.")
+    messages.success(request, _("Telegram scollegato."))
     return redirect("persone:portale")
 
 

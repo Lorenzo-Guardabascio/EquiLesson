@@ -1,13 +1,14 @@
 {% extends "core/base.html" %}
+{% load i18n %}
 
-{% block title %}Elimina lezione{% endblock %}
+{% block title %}{% trans "Elimina lezione" %}{% endblock %}
 
 {% block content %}
-<h1 class="h4 mb-3">Eliminare questa lezione?</h1>
+<h1 class="h4 mb-3">{% trans "Eliminare questa lezione?" %}</h1>
 <p>{{ lezione }} — {{ lezione.data|date:"d/m/Y" }} {{ lezione.ora_inizio|time:"H:i" }}</p>
 <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Sì, elimina</button>
-    <a href="{% url 'lezioni:calendario' %}" class="btn btn-outline-secondary">Annulla</a>
+    <button type="submit" class="btn btn-danger">{% trans "Sì, elimina" %}</button>
+    <a href="{% url 'lezioni:calendario' %}" class="btn btn-outline-secondary">{% trans "Annulla" %}</a>
 </form>
 {% endblock %}

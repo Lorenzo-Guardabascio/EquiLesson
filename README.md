@@ -111,6 +111,27 @@ on/off switch in `/admin/core/impostazioni/` (both off by default):
 | `comunicazioni` | reminders/alerts (email, Telegram, WhatsApp), broadcasts |
 | `report` | attendance, horse usage, instructor/arena occupancy, expiries |
 
+## Language switcher (Italian/English)
+
+The app has a language switcher in the navbar (Italian and English), backed
+by Django's standard session-based i18n — no URL prefixes, so existing links
+(including the ones embedded in the QR membership cards) keep working
+regardless of language. Coverage: navigation, buttons, headings, and view
+messages across the main templates. **Not yet translated**: Django admin
+field labels and model choices (e.g. lesson/package type names) — the admin
+is expected to stay Italian-only for now, since day-to-day staff use is in
+Italian; this is a known gap, not an oversight.
+
+Translations live in `locale/en/LC_MESSAGES/django.po` (+ compiled
+`django.mo`). Normally you'd regenerate these with Django's
+`makemessages`/`compilemessages`, but those require the `gettext` system
+package (`xgettext`/`msgfmt`), which may not be available everywhere without
+root. If you don't have it either, `locale/genera_traduzioni.py` builds the
+`.po`/`.mo` files directly with `polib` (pure Python, no system package) from
+a hand-maintained dictionary of strings — update that dictionary and rerun
+the script when you add new translatable text. If `gettext` **is** available
+on your system, just use the standard Django commands instead.
+
 ## Out of scope (deliberately)
 
 - Payments/invoicing: no revenue is tracked anywhere in the system
@@ -147,7 +168,7 @@ on/off switch in `/admin/core/impostazioni/` (both off by default):
 - [ ] Privacy/liability consent with tracked acceptance (a timestamp, not
       just a checkbox)
 - [ ] Digital membership card with QR code for students
-- [ ] Bilingual Italian/English interface (the app itself, not just this file)
+- [x] Bilingual Italian/English interface (templates and view messages; admin labels still Italian-only)
 
 Possible future extensions (not blocking): a dedicated visual design pass,
 competitions/events management, horse feeding plans, tack room inventory,
@@ -307,6 +328,29 @@ di default):
 | `comunicazioni` | promemoria/alert (email, Telegram, WhatsApp), broadcast |
 | `report` | presenze/assenze, utilizzo cavalli, occupazione istruttori/campi, scadenze |
 
+## Switch di lingua (italiano/inglese)
+
+L'app ha uno switch di lingua in navbar (italiano e inglese), basato sull'i18n
+standard di Django via sessione — nessun prefisso negli URL, quindi i link
+già esistenti (compresi quelli incorporati nei QR delle tessere digitali)
+continuano a funzionare a prescindere dalla lingua. Copertura: navigazione,
+pulsanti, titoli e messaggi delle view sui template principali. **Non ancora
+tradotti**: le etichette dei campi e le scelte dei modelli nell'admin di
+Django (es. nomi dei tipi di lezione/pacchetto) — l'admin resta
+volutamente solo in italiano per ora, visto che l'uso quotidiano dello staff
+è in italiano; è un limite noto, non una svista.
+
+Le traduzioni vivono in `locale/en/LC_MESSAGES/django.po` (+ `django.mo`
+compilato). Normalmente si rigenererebbero con `makemessages`/
+`compilemessages` di Django, ma richiedono il pacchetto di sistema `gettext`
+(`xgettext`/`msgfmt`), che potrebbe non essere disponibile ovunque senza
+accesso root. Se non ce l'hai nemmeno tu, `locale/genera_traduzioni.py`
+genera `.po`/`.mo` direttamente con `polib` (puro Python, nessun pacchetto di
+sistema) a partire da un dizionario di stringhe mantenuto a mano — aggiorna
+quel dizionario e rilancia lo script quando aggiungi nuovo testo traducibile.
+Se `gettext` **è** disponibile sul tuo sistema, usa pure i comandi standard
+di Django al suo posto.
+
 ## Fuori scope (deciso esplicitamente)
 
 - Pagamenti/fatturazione: nessun incasso tracciato in nessun punto del
@@ -341,7 +385,7 @@ di default):
 - [ ] Portale di sola lettura per i proprietari di cavalli in pensione
 - [ ] Consenso privacy/liberatoria con tracciamento di accettazione (data, non solo una checkbox)
 - [ ] Tessera digitale con QR per gli allievi
-- [ ] Interfaccia bilingue italiano/inglese (dell'app stessa, non solo di questo file)
+- [x] Interfaccia bilingue italiano/inglese (template e messaggi delle view; etichette admin ancora solo in italiano)
 
 Estensioni future possibili (non bloccanti): rifinitura estetica dedicata,
 gestione gare/eventi, piano alimentare cavallo, magazzino/tack room, app

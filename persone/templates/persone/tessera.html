@@ -1,21 +1,21 @@
 {% extends "core/base.html" %}
+{% load i18n %}
 
-{% block title %}La mia tessera - Gestionale maneggio{% endblock %}
+{% block title %}{% trans "La mia tessera" %} - {% trans "Gestionale maneggio" %}{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">La mia tessera</h1>
+<h1 class="h3 mb-4">{% trans "La mia tessera" %}</h1>
 
 <div class="card shadow-sm" style="max-width: 380px;">
     <div class="card-body text-center">
         <h2 class="h5">{{ allievo }}</h2>
         <p class="text-muted small mb-3">{{ allievo.get_stato_display }}</p>
-        <img src="{% url 'persone:tessera_qr_immagine' %}" alt="QR della tessera" class="img-fluid mb-3" style="max-width: 220px;">
+        <img src="{% url 'persone:tessera_qr_immagine' %}" alt="{% trans 'QR della tessera' %}" class="img-fluid mb-3" style="max-width: 220px;">
         <p class="text-muted small mb-0">
-            Un istruttore o la segreteria può inquadrare questo codice per
-            verificare rapidamente il tuo tesseramento.
+            {% trans "Un istruttore o la segreteria può inquadrare questo codice per verificare rapidamente il tuo tesseramento." %}
         </p>
     </div>
 </div>
 
-<p class="mt-3"><a href="{% url 'persone:portale' %}">&larr; Torna al portale</a></p>
+<p class="mt-3"><a href="{% url 'persone:portale' %}">&larr; {% trans "Torna al portale" %}</a></p>
 {% endblock %}

@@ -1,30 +1,33 @@
 {% extends "core/base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Calendario lezioni{% endblock %}
+{% block title %}{% trans "Calendario lezioni" %}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Calendario lezioni</h1>
-    <a href="{% url 'lezioni:lezione_nuova' %}" class="btn btn-primary btn-sm">+ Nuova lezione</a>
+    <h1 class="h3 mb-0">{% trans "Calendario lezioni" %}</h1>
+    <a href="{% url 'lezioni:lezione_nuova' %}" class="btn btn-primary btn-sm">+ {% trans "Nuova lezione" %}</a>
 </div>
 
 <div class="d-flex gap-3 small text-muted mb-3">
-    <span><span class="badge" style="background:#6c757d">&nbsp;</span> Prenotata</span>
-    <span><span class="badge" style="background:#0d6efd">&nbsp;</span> Confermata</span>
-    <span><span class="badge" style="background:#198754">&nbsp;</span> Svolta</span>
-    <span><span class="badge" style="background:#dc3545">&nbsp;</span> Annullata</span>
+    <span><span class="badge" style="background:#6c757d">&nbsp;</span> {% trans "Prenotata" %}</span>
+    <span><span class="badge" style="background:#0d6efd">&nbsp;</span> {% trans "Confermata" %}</span>
+    <span><span class="badge" style="background:#198754">&nbsp;</span> {% trans "Svolta" %}</span>
+    <span><span class="badge" style="background:#dc3545">&nbsp;</span> {% trans "Annullata" %}</span>
 </div>
 
 <div id="calendario" class="bg-white rounded shadow-sm p-2"></div>
 
+{% get_current_language as CURRENT_LANGUAGE %}
 <script src="{% static 'vendor/fullcalendar/index.global.min.js' %}"></script>
+{% if CURRENT_LANGUAGE == 'it' %}
 <script src="{% static 'vendor/fullcalendar/it.global.min.js' %}"></script>
+{% endif %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendario');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        locale: 'it',
+        locale: '{{ CURRENT_LANGUAGE }}',
         firstDay: 1,
         height: 'auto',
         headerToolbar: {
@@ -40,9 +43,9 @@ document.addEventListener('DOMContentLoaded', function () {
         eventDidMount: function (info) {
             var props = info.event.extendedProps;
             var titolo = info.event.title;
-            if (props.campo) titolo += '\nCampo: ' + props.campo;
-            if (props.istruttore) titolo += '\nIstruttore: ' + props.istruttore;
-            titolo += '\nStato: ' + props.stato;
+            if (props.campo) titolo += '\n{% trans "Campo" %}: ' + props.campo;
+            if (props.istruttore) titolo += '\n{% trans "Istruttore" %}: ' + props.istruttore;
+            titolo += '\n{% trans "Stato" %}: ' + props.stato;
             info.el.setAttribute('title', titolo);
         }
     });

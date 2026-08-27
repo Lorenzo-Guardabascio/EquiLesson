@@ -1,9 +1,10 @@
 {% extends "core/base.html" %}
+{% load i18n %}
 
-{% block title %}Verifica tessera - Gestionale maneggio{% endblock %}
+{% block title %}{% trans "Verifica tessera" %} - {% trans "Gestionale maneggio" %}{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">Verifica tessera</h1>
+<h1 class="h3 mb-4">{% trans "Verifica tessera" %}</h1>
 
 {% if valido %}
 <div class="card shadow-sm" style="max-width: 480px;">
@@ -13,27 +14,27 @@
             {{ allievo.get_stato_display }}
         </span>
         <dl class="row small mb-0">
-            <dt class="col-sm-5">Tessera FISE</dt>
+            <dt class="col-sm-5">{% trans "Tessera FISE" %}</dt>
             <dd class="col-sm-7">
                 {% if allievo.tessera_fise_numero %}
                     {{ allievo.tessera_fise_numero }}
-                    {% if allievo.tessera_fise_scadenza %}(scad. {{ allievo.tessera_fise_scadenza|date:"d/m/Y" }}){% endif %}
+                    {% if allievo.tessera_fise_scadenza %}({% blocktrans with data=allievo.tessera_fise_scadenza|date:"d/m/Y" %}scad. {{ data }}{% endblocktrans %}){% endif %}
                 {% else %}<span class="text-muted">—</span>{% endif %}
             </dd>
-            <dt class="col-sm-5">Tessera FITETREK</dt>
+            <dt class="col-sm-5">{% trans "Tessera FITETREK" %}</dt>
             <dd class="col-sm-7">
                 {% if allievo.tessera_fitetrek_numero %}
                     {{ allievo.tessera_fitetrek_numero }}
-                    {% if allievo.tessera_fitetrek_scadenza %}(scad. {{ allievo.tessera_fitetrek_scadenza|date:"d/m/Y" }}){% endif %}
+                    {% if allievo.tessera_fitetrek_scadenza %}({% blocktrans with data=allievo.tessera_fitetrek_scadenza|date:"d/m/Y" %}scad. {{ data }}{% endblocktrans %}){% endif %}
                 {% else %}<span class="text-muted">—</span>{% endif %}
             </dd>
         </dl>
     </div>
 </div>
 <p class="text-muted small mt-3">
-    Per motivi di riservatezza questa pagina non mostra certificato medico o note: per quei dati consulta la scheda completa in amministrazione.
+    {% trans "Per motivi di riservatezza questa pagina non mostra certificato medico o note: per quei dati consulta la scheda completa in amministrazione." %}
 </p>
 {% else %}
-<div class="alert alert-danger" style="max-width: 480px;">Codice non valido.</div>
+<div class="alert alert-danger" style="max-width: 480px;">{% trans "Codice non valido." %}</div>
 {% endif %}
 {% endblock %}

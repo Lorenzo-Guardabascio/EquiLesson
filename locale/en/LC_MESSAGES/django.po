@@ -1,0 +1,452 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: EquiLesson\n"
+"Report-Msgid-Bugs-To: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Accedi"
+msgstr "Log in"
+
+msgid "Accedi per continuare."
+msgstr "Log in to continue."
+
+msgid "Accettato"
+msgstr "Accepted"
+
+msgid "Accetto"
+msgstr "Accept"
+
+msgid "Aggiungi partecipante"
+msgstr "Add participant"
+
+msgid "Al"
+msgstr "To"
+
+msgid "Allievi attivi"
+msgstr "Active students"
+
+msgid "Allievi in scadenza (prossimi 30 giorni)"
+msgstr "Students with upcoming expiries (next 30 days)"
+
+msgid "Allievo"
+msgstr "Student"
+
+msgid "Amministrazione"
+msgstr "Administration"
+
+msgid "Annulla"
+msgstr "Cancel"
+
+msgid "Annullata"
+msgstr "Cancelled"
+
+msgid "Applica"
+msgstr "Apply"
+
+msgid "Apri"
+msgstr "Open"
+
+msgid "Assenti"
+msgstr "Absent"
+
+msgid "Box"
+msgstr "Stall"
+
+msgid "Calendario"
+msgstr "Calendar"
+
+msgid "Calendario lezioni"
+msgstr "Lesson calendar"
+
+msgid "Campo"
+msgstr "Arena"
+
+msgid "Cavalli"
+msgstr "Horses"
+
+msgid "Cavalli: scadenze sanitarie (prossimi 30 giorni)"
+msgstr "Horses: health due dates (next 30 days)"
+
+msgid "Cavallo"
+msgstr "Horse"
+
+msgid "Certificati medici in scadenza (30 giorni)"
+msgstr "Medical certificates expiring (30 days)"
+
+msgid "Codice non valido."
+msgstr "Invalid code."
+
+msgid "Confermata"
+msgstr "Confirmed"
+
+msgid "Consensi"
+msgstr "Consents"
+
+msgid "Consulta le tue prossime lezioni e il pacchetto residuo."
+msgstr "Check your upcoming lessons and remaining package."
+
+msgid "Consulta lo stato del tuo cavallo e le prossime scadenze sanitarie."
+msgstr "Check your horse's status and upcoming health due dates."
+
+msgid "Dal"
+msgstr "From"
+
+msgid "Data"
+msgstr "Date"
+
+msgid "Dati della lezione"
+msgstr "Lesson details"
+
+msgid "e invia questo messaggio:"
+msgstr "and send this message:"
+
+msgid "Elimina lezione"
+msgstr "Delete lesson"
+
+msgid "Eliminare questa lezione?"
+msgstr "Delete this lesson?"
+
+msgid "Esci"
+msgstr "Log out"
+
+msgid "Esporta CSV"
+msgstr "Export CSV"
+
+msgid "Esporta PDF"
+msgstr "Export PDF"
+
+msgid "Genera codice di collegamento"
+msgstr "Generate linking code"
+
+msgid "Gestionale maneggio"
+msgstr "EquiLesson"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "il bot Telegram del centro"
+msgstr "the center's Telegram bot"
+
+msgid "Il collegamento avviene entro qualche minuto dall'invio."
+msgstr "The link is completed within a few minutes of sending."
+
+msgid "Il mio cavallo"
+msgstr "My horse"
+
+msgid "Il mio pacchetto"
+msgstr "My package"
+
+msgid "Il mio portale"
+msgstr "My portal"
+
+msgid ""
+"Il periodo si applica a presenze, utilizzo cavalli e occupazione "
+"istruttori/campi."
+msgstr ""
+"The period applies to attendance, horse usage, and instructor/arena "
+"occupancy."
+
+msgid "In scadenza"
+msgstr "Expiring"
+
+msgid "Istruttore"
+msgstr "Instructor"
+
+msgid ""
+"L'accettazione viene registrata con data/ora e indirizzo IP, insieme al "
+"testo esatto mostrato qui sopra."
+msgstr ""
+"Acceptance is recorded with date/time and IP address, along with the exact "
+"text shown above."
+
+msgid "La mia tessera"
+msgstr "My membership card"
+
+msgid "Le mie lezioni"
+msgstr "My lessons"
+
+msgid "Lezioni"
+msgstr "Lessons"
+
+msgid "Lezioni oggi"
+msgstr "Lessons today"
+
+msgid "Lezioni passate (ultime 10)"
+msgstr "Past lessons (last 10)"
+
+msgid "Nessuna lezione aperta alla prenotazione al momento."
+msgstr "No lessons currently open for booking."
+
+msgid "Nessuna lezione in programma."
+msgstr "No lessons scheduled."
+
+msgid "Nessuna lezione nel periodo."
+msgstr "No lessons in this period."
+
+msgid "Nessuna lezione passata registrata."
+msgstr "No past lessons recorded."
+
+msgid "Nessuna partecipazione nel periodo."
+msgstr "No participation in this period."
+
+msgid "Nessuna scadenza imminente."
+msgstr "No upcoming expiries."
+
+msgid "Nessuna scadenza nei prossimi 30 giorni."
+msgstr "No expiries in the next 30 days."
+
+msgid "Nessuna scadenza registrata."
+msgstr "No due dates recorded."
+
+msgid "Nessuna scadenza sanitaria nei prossimi 30 giorni."
+msgstr "No health due dates in the next 30 days."
+
+msgid "Nessun pacchetto attivo al momento."
+msgstr "No active package at the moment."
+
+msgid "Nessun pacchetto registrato."
+msgstr "No packages recorded."
+
+msgid "Nessun utilizzo nel periodo."
+msgstr "No usage in this period."
+
+msgid "Nome utente"
+msgstr "Username"
+
+msgid "Nome utente o password non corretti."
+msgstr "Incorrect username or password."
+
+msgid "Non ancora accettato"
+msgstr "Not yet accepted"
+
+msgid "Non risulta nessun cavallo in pensione a tuo nome."
+msgstr "No boarding horse is registered under your name."
+
+msgid "Note"
+msgstr "Notes"
+
+msgid "Notifiche su Telegram"
+msgstr "Telegram notifications"
+
+msgid "Nuova lezione"
+msgstr "New lesson"
+
+msgid "Occupazione campi"
+msgstr "Arena occupancy"
+
+msgid "Occupazione istruttori"
+msgstr "Instructor occupancy"
+
+msgid "Ora fine"
+msgstr "End time"
+
+msgid "Ora inizio"
+msgstr "Start time"
+
+msgid "Pacchetto"
+msgstr "Package"
+
+msgid "Partecipanti"
+msgstr "Participants"
+
+msgid "Password"
+msgstr "Password"
+
+msgid ""
+"Per motivi di riservatezza questa pagina non mostra certificato medico o "
+"note: per quei dati consulta la scheda completa in amministrazione."
+msgstr ""
+"For privacy reasons this page doesn't show the medical certificate or notes:"
+" for that data check the full record in administration."
+
+msgid "portale"
+msgstr "portal"
+
+msgid "Prenota"
+msgstr "Book"
+
+msgid "Prenotata"
+msgstr "Booked"
+
+msgid "Prenota una lezione"
+msgstr "Book a lesson"
+
+msgid "Presenze/assenze per allievo"
+msgstr "Attendance/absences per student"
+
+msgid "Prossime lezioni"
+msgstr "Upcoming lessons"
+
+msgid "Prossime scadenze sanitarie"
+msgstr "Upcoming health due dates"
+
+msgid "Razza"
+msgstr "Breed"
+
+msgid "Report"
+msgstr "Reports"
+
+msgid ""
+"Ricevi i promemoria delle lezioni e gli alert di scadenza anche su Telegram."
+msgstr "Get lesson reminders and expiry alerts on Telegram too."
+
+msgid "Rimuovi"
+msgstr "Remove"
+
+msgid "Salva lezione"
+msgstr "Save lesson"
+
+msgid "Scadenza"
+msgstr "Due date"
+
+msgid "Scaduto"
+msgstr "Expired"
+
+msgid "Scollega"
+msgstr "Unlink"
+
+msgid "seleziona"
+msgstr "select"
+
+msgid "Sì, elimina"
+msgstr "Yes, delete"
+
+msgid "Stato"
+msgstr "Status"
+
+msgid "Storico pacchetti"
+msgstr "Package history"
+
+msgid "Svolta"
+msgstr "Completed"
+
+msgid "Svolte"
+msgstr "Completed"
+
+msgid "Telegram collegato: riceverai qui promemoria e avvisi."
+msgstr "Telegram linked: you'll receive reminders and alerts here."
+
+msgid "Tessera FISE"
+msgstr "FISE membership card"
+
+msgid "Tessera FITETREK"
+msgstr "FITETREK membership card"
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "Tipo di lezione"
+msgstr "Lesson type"
+
+msgid "Torna al calendario"
+msgstr "Back to calendar"
+
+msgid "Torna al portale"
+msgstr "Back to portal"
+
+msgid ""
+"Un istruttore o la segreteria può inquadrare questo codice per verificare "
+"rapidamente il tuo tesseramento."
+msgstr ""
+"An instructor or the front desk can scan this code to quickly verify your "
+"membership."
+
+msgid "Utilizzo cavalli"
+msgstr "Horse usage"
+
+msgid "Vai all'amministrazione"
+msgstr "Go to administration"
+
+msgid "Vai al mio portale"
+msgstr "Go to my portal"
+
+msgid "Verifica tessera"
+msgstr "Verify membership card"
+
+msgid "Lingua"
+msgstr "Language"
+
+msgid "QR della tessera"
+msgstr "Membership card QR code"
+
+msgid ""
+"Il cavallo ti verrà assegnato dalla segreteria dopo la prenotazione. Puoi "
+"annullare in qualsiasi momento dal tuo"
+msgstr ""
+"The horse will be assigned by the front desk after booking. You can cancel "
+"at any time from your"
+
+msgid "%(n)s/%(max)s posti"
+msgstr "%(n)s/%(max)s spots"
+
+msgid "Bentornato, %(name)s"
+msgstr "Welcome back, %(name)s"
+
+msgid "Ciao, %(name)s"
+msgstr "Hi, %(name)s"
+
+msgid "Ciao, %(nome)s"
+msgstr "Hi, %(nome)s"
+
+msgid "scade il %(data)s"
+msgstr "expires on %(data)s"
+
+msgid "%(tot)s lezioni residue"
+msgstr "%(tot)s lessons remaining"
+
+msgid "Valido fino al %(data)s"
+msgstr "Valid until %(data)s"
+
+msgid "dal %(dal)s al %(al)s"
+msgstr "from %(dal)s to %(al)s"
+
+msgid "%(res)s/%(tot)s residue"
+msgstr "%(res)s/%(tot)s remaining"
+
+msgid "il %(data)s"
+msgstr "on %(data)s"
+
+msgid "scad. %(data)s"
+msgstr "exp. %(data)s"
+
+msgid "Codice generato: invialo al bot Telegram come indicato qui sotto."
+msgstr "Code generated: send it to the Telegram bot as shown below."
+
+msgid "Consenso registrato."
+msgstr "Consent recorded."
+
+msgid "Lezione eliminata."
+msgstr "Lesson deleted."
+
+msgid "Lezione salvata correttamente."
+msgstr "Lesson saved successfully."
+
+msgid "Non puoi annullare una lezione già passata."
+msgstr "You can't cancel a lesson that has already passed."
+
+msgid "Prenotazione annullata."
+msgstr "Booking cancelled."
+
+msgid ""
+"Prenotazione registrata: il cavallo ti verrà assegnato dalla segreteria."
+msgstr "Booking recorded: the horse will be assigned by the front desk."
+
+msgid "Questa lezione è nel frattempo diventata al completo."
+msgstr "This lesson has since become full."
+
+msgid "Questa lezione non è più prenotabile."
+msgstr "This lesson can no longer be booked."
+
+msgid "Sei già iscritto a questa lezione."
+msgstr "You're already registered for this lesson."
+
+msgid "Telegram scollegato."
+msgstr "Telegram unlinked."
+
+msgid ""
+"La prenotazione autonoma non è attiva al momento: contatta la segreteria."
+msgstr "Self-booking isn't active at the moment: contact the front desk."

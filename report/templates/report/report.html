@@ -1,28 +1,29 @@
 {% extends "core/base.html" %}
+{% load i18n %}
 
-{% block title %}Report - Gestionale maneggio{% endblock %}
+{% block title %}{% trans "Report" %} - {% trans "Gestionale maneggio" %}{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">Report</h1>
+<h1 class="h3 mb-4">{% trans "Report" %}</h1>
 
 <form method="get" class="row g-2 align-items-end mb-4">
     <div class="col-auto">
-        <label class="form-label small mb-0">Dal</label>
+        <label class="form-label small mb-0">{% trans "Dal" %}</label>
         <input type="date" name="dal" value="{{ dal|date:'Y-m-d' }}" class="form-control form-control-sm">
     </div>
     <div class="col-auto">
-        <label class="form-label small mb-0">Al</label>
+        <label class="form-label small mb-0">{% trans "Al" %}</label>
         <input type="date" name="al" value="{{ al|date:'Y-m-d' }}" class="form-control form-control-sm">
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-sm btn-primary">Applica</button>
+        <button type="submit" class="btn btn-sm btn-primary">{% trans "Applica" %}</button>
     </div>
     <div class="col-auto text-muted small">
-        Il periodo si applica a presenze, utilizzo cavalli e occupazione istruttori/campi.
+        {% trans "Il periodo si applica a presenze, utilizzo cavalli e occupazione istruttori/campi." %}
     </div>
     <div class="col-auto ms-auto d-flex gap-2">
-        <a href="{% url 'report:report_csv' %}?dal={{ dal|date:'Y-m-d' }}&al={{ al|date:'Y-m-d' }}" class="btn btn-sm btn-outline-secondary">Esporta CSV</a>
-        <a href="{% url 'report:report_pdf' %}?dal={{ dal|date:'Y-m-d' }}&al={{ al|date:'Y-m-d' }}" class="btn btn-sm btn-outline-secondary">Esporta PDF</a>
+        <a href="{% url 'report:report_csv' %}?dal={{ dal|date:'Y-m-d' }}&al={{ al|date:'Y-m-d' }}" class="btn btn-sm btn-outline-secondary">{% trans "Esporta CSV" %}</a>
+        <a href="{% url 'report:report_pdf' %}?dal={{ dal|date:'Y-m-d' }}&al={{ al|date:'Y-m-d' }}" class="btn btn-sm btn-outline-secondary">{% trans "Esporta PDF" %}</a>
     </div>
 </form>
 
@@ -30,10 +31,10 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Presenze/assenze per allievo</h2>
+                <h2 class="h5 card-title">{% trans "Presenze/assenze per allievo" %}</h2>
                 <div class="table-responsive">
                 <table class="table table-sm align-middle">
-                    <thead><tr><th>Allievo</th><th class="text-end">Svolte</th><th class="text-end">Assenti</th><th class="text-end">%</th></tr></thead>
+                    <thead><tr><th>{% trans "Allievo" %}</th><th class="text-end">{% trans "Svolte" %}</th><th class="text-end">{% trans "Assenti" %}</th><th class="text-end">%</th></tr></thead>
                     <tbody>
                         {% for r in presenze %}
                         <tr>
@@ -43,7 +44,7 @@
                             <td class="text-end">{% if r.percentuale is not None %}{{ r.percentuale }}%{% else %}—{% endif %}</td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="4" class="text-muted">Nessuna partecipazione nel periodo.</td></tr>
+                        <tr><td colspan="4" class="text-muted">{% trans "Nessuna partecipazione nel periodo." %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -55,15 +56,15 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Utilizzo cavalli</h2>
+                <h2 class="h5 card-title">{% trans "Utilizzo cavalli" %}</h2>
                 <div class="table-responsive">
                 <table class="table table-sm align-middle">
-                    <thead><tr><th>Cavallo</th><th class="text-end">Lezioni</th></tr></thead>
+                    <thead><tr><th>{% trans "Cavallo" %}</th><th class="text-end">{% trans "Lezioni" %}</th></tr></thead>
                     <tbody>
                         {% for r in utilizzo_cavalli %}
                         <tr><td>{{ r.cavallo__nome }}</td><td class="text-end">{{ r.numero_lezioni }}</td></tr>
                         {% empty %}
-                        <tr><td colspan="2" class="text-muted">Nessun utilizzo nel periodo.</td></tr>
+                        <tr><td colspan="2" class="text-muted">{% trans "Nessun utilizzo nel periodo." %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -77,15 +78,15 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Occupazione istruttori</h2>
+                <h2 class="h5 card-title">{% trans "Occupazione istruttori" %}</h2>
                 <div class="table-responsive">
                 <table class="table table-sm align-middle">
-                    <thead><tr><th>Istruttore</th><th class="text-end">Lezioni</th></tr></thead>
+                    <thead><tr><th>{% trans "Istruttore" %}</th><th class="text-end">{% trans "Lezioni" %}</th></tr></thead>
                     <tbody>
                         {% for r in occupazione_istruttori %}
                         <tr><td>{{ r.istruttore__nome }} {{ r.istruttore__cognome }}</td><td class="text-end">{{ r.numero_lezioni }}</td></tr>
                         {% empty %}
-                        <tr><td colspan="2" class="text-muted">Nessuna lezione nel periodo.</td></tr>
+                        <tr><td colspan="2" class="text-muted">{% trans "Nessuna lezione nel periodo." %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -97,15 +98,15 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Occupazione campi</h2>
+                <h2 class="h5 card-title">{% trans "Occupazione campi" %}</h2>
                 <div class="table-responsive">
                 <table class="table table-sm align-middle">
-                    <thead><tr><th>Campo</th><th class="text-end">Lezioni</th></tr></thead>
+                    <thead><tr><th>{% trans "Campo" %}</th><th class="text-end">{% trans "Lezioni" %}</th></tr></thead>
                     <tbody>
                         {% for r in occupazione_campi %}
                         <tr><td>{{ r.campo__nome }}</td><td class="text-end">{{ r.numero_lezioni }}</td></tr>
                         {% empty %}
-                        <tr><td colspan="2" class="text-muted">Nessuna lezione nel periodo.</td></tr>
+                        <tr><td colspan="2" class="text-muted">{% trans "Nessuna lezione nel periodo." %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -119,20 +120,20 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Allievi in scadenza (prossimi 30 giorni)</h2>
+                <h2 class="h5 card-title">{% trans "Allievi in scadenza (prossimi 30 giorni)" %}</h2>
                 <div class="table-responsive">
                 <table class="table table-sm align-middle">
-                    <thead><tr><th>Allievo</th><th>Tipo</th><th>Scadenza</th><th></th></tr></thead>
+                    <thead><tr><th>{% trans "Allievo" %}</th><th>{% trans "Tipo" %}</th><th>{% trans "Scadenza" %}</th><th></th></tr></thead>
                     <tbody>
                         {% for v in scadenze %}
                         <tr>
                             <td>{{ v.allievo }}</td>
                             <td>{{ v.tipo }}</td>
                             <td>{{ v.scadenza|date:"d/m/Y" }}</td>
-                            <td>{% if v.scaduto %}<span class="badge text-bg-danger">Scaduto</span>{% else %}<span class="badge text-bg-warning">In scadenza</span>{% endif %}</td>
+                            <td>{% if v.scaduto %}<span class="badge text-bg-danger">{% trans "Scaduto" %}</span>{% else %}<span class="badge text-bg-warning">{% trans "In scadenza" %}</span>{% endif %}</td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="4" class="text-muted">Nessuna scadenza nei prossimi 30 giorni.</td></tr>
+                        <tr><td colspan="4" class="text-muted">{% trans "Nessuna scadenza nei prossimi 30 giorni." %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -144,20 +145,20 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <h2 class="h5 card-title">Cavalli: scadenze sanitarie (prossimi 30 giorni)</h2>
+                <h2 class="h5 card-title">{% trans "Cavalli: scadenze sanitarie (prossimi 30 giorni)" %}</h2>
                 <div class="table-responsive">
                 <table class="table table-sm align-middle">
-                    <thead><tr><th>Cavallo</th><th>Tipo</th><th>Scadenza</th><th></th></tr></thead>
+                    <thead><tr><th>{% trans "Cavallo" %}</th><th>{% trans "Tipo" %}</th><th>{% trans "Scadenza" %}</th><th></th></tr></thead>
                     <tbody>
                         {% for v in scadenze_cavalli %}
                         <tr>
                             <td>{{ v.cavallo }}</td>
                             <td>{{ v.tipo }}</td>
                             <td>{{ v.scadenza|date:"d/m/Y" }}</td>
-                            <td>{% if v.scaduto %}<span class="badge text-bg-danger">Scaduto</span>{% else %}<span class="badge text-bg-warning">In scadenza</span>{% endif %}</td>
+                            <td>{% if v.scaduto %}<span class="badge text-bg-danger">{% trans "Scaduto" %}</span>{% else %}<span class="badge text-bg-warning">{% trans "In scadenza" %}</span>{% endif %}</td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="4" class="text-muted">Nessuna scadenza sanitaria nei prossimi 30 giorni.</td></tr>
+                        <tr><td colspan="4" class="text-muted">{% trans "Nessuna scadenza sanitaria nei prossimi 30 giorni." %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
