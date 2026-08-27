@@ -43,7 +43,6 @@ class Pacchetto(models.Model):
     data_inizio = models.DateField()
     data_scadenza = models.DateField()
     lezioni_totali = models.PositiveIntegerField()
-    lezioni_utilizzate = models.PositiveIntegerField(default=0)
     stato = models.CharField(max_length=10, choices=Stato.choices, default=Stato.ATTIVO)
     note = models.CharField(max_length=255, blank=True)
 
@@ -54,6 +53,22 @@ class Pacchetto(models.Model):
 
     def __str__(self):
         return f"{self.allievo} - {self.tipo_pacchetto} ({self.lezioni_residue} residue)"
+
+    @property
+    def lezioni_utilizzate(self):
+        """Quante lezioni ha già consumato: calcolato, non un contatore salvato
+        a mano. Prima era un campo che nessuna parte del codice aggiornava mai
+        — si poteva collegare un pacchetto a una partecipazione e il conteggio
+        non si muoveva di una virgola. Contando dalle partecipazioni vere non
+        può più disallinearsi dalla realtà: conta come "usata" una lezione
+        svolta o un'assenza (il cavallo/istruttore/orario erano comunque
+        stati riservati), non una lezione ancora prevista o annullata.
+        """
+        from lezioni.models import Partecipazione
+
+        return self.partecipazioni.filter(
+            stato__in=[Partecipazione.Stato.SVOLTA, Partecipazione.Stato.ASSENTE]
+        ).count()
 
     @property
     def lezioni_residue(self):

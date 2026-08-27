@@ -165,17 +165,39 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Il pacchetto scelto in una riga deve appartenere all'allievo di quella
-    // stessa riga: qui si filtrano le opzioni visibili, ma la validazione
-    // vera è server-side in PartecipazioneForm.clean() (questo è solo per
-    // non dover cercare a occhio in un elenco con i pacchetti di tutti).
+    // stessa riga: qui si filtrano le opzioni visibili (la validazione vera
+    // resta comunque server-side in PartecipazioneForm.clean()). In più: se
+    // l'allievo ha esattamente un pacchetto attivo e la riga non ha già una
+    // scelta esplicita, lo si preseleziona da soli — non c'è motivo per cui
+    // la segreteria debba scegliere a mano il pacchetto praticamente ogni
+    // volta, dato che un allievo ha in pratica sempre un solo pacchetto
+    // attivo alla volta. Se sono zero o più di uno resta vuoto: sceglierlo
+    // in quel caso è una decisione reale, non un automatismo sicuro.
     function opzioniPacchettoPerAllievo(selectPacchetto, allievoId) {
+        // Legge dalla copia originale catturata in inizializzaRiga, MAI dal
+        // <select> live: setChoices(..., true) sotto sostituisce le opzioni
+        // reali del <select> sottostante con quelle filtrate, quindi rileggere
+        // da lì al filtro successivo troverebbe solo quello che è sopravvissuto
+        // all'ultimo filtro — i pacchetti esclusi sarebbero persi per sempre,
+        // non solo nascosti (bug reale, trovato testando con un browser vero:
+        // al caricamento pagina, con allievo ancora vuoto, il primo filtro
+        // svuotava la select cancellando tutti i pacchetti che c'erano).
+        var originali = selectPacchetto._opzioniOriginali || [];
         var opzioni = [];
-        selectPacchetto.querySelectorAll('option').forEach(function (opt) {
-            var appartieneAllievo = !opt.dataset.allievo || opt.value === '' || opt.dataset.allievo === allievoId;
-            if (appartieneAllievo) {
-                opzioni.push({ value: opt.value, label: opt.textContent, selected: opt.selected });
+        var giaSelezionato = false;
+        var candidatoAttivo = null;
+        originali.forEach(function (opt) {
+            var appartieneAllievo = !opt.allievo || opt.value === '' || opt.allievo === allievoId;
+            if (!appartieneAllievo) return;
+            if (opt.selected && opt.value !== '') giaSelezionato = true;
+            if (opt.attivo === '1' && opt.allievo === allievoId) {
+                candidatoAttivo = candidatoAttivo === null ? opt.value : false;
             }
+            opzioni.push({ value: opt.value, label: opt.label, selected: opt.selected });
         });
+        if (!giaSelezionato && candidatoAttivo) {
+            opzioni.forEach(function (o) { o.selected = (o.value === candidatoAttivo); });
+        }
         return opzioni;
     }
 
@@ -193,7 +215,21 @@ document.addEventListener('DOMContentLoaded', function () {
     function inizializzaRiga(riga) {
         riga.querySelectorAll('select[data-searchable="true"]').forEach(inizializzaSearchable);
         var selectPacchetto = riga.querySelector('[data-role="pacchetto"]');
-        if (selectPacchetto) inizializzaSearchable(selectPacchetto);
+        if (selectPacchetto) {
+            inizializzaSearchable(selectPacchetto);
+            if (!selectPacchetto._opzioniOriginali) {
+                selectPacchetto._opzioniOriginali = Array.prototype.map.call(
+                    selectPacchetto.querySelectorAll('option'),
+                    function (opt) {
+                        return {
+                            value: opt.value, label: opt.textContent,
+                            allievo: opt.dataset.allievo, attivo: opt.dataset.attivo,
+                            selected: opt.selected,
+                        };
+                    }
+                );
+            }
+        }
         var selectAllievo = riga.querySelector('[data-role="allievo"]');
         if (selectAllievo) {
             selectAllievo.addEventListener('change', function () { aggiornaPacchettiRiga(riga); });

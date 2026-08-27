@@ -149,20 +149,24 @@ class Command(BaseCommand):
             allievi[f"{dati['nome']} {dati['cognome']}"] = allievo
 
         # --- Pacchetti assegnati ad alcuni allievi ---
-        Pacchetto.objects.get_or_create(
+        # lezioni_utilizzate non si imposta più a mano: è calcolata dalle
+        # partecipazioni svolte/assenti collegate (vedi Pacchetto.lezioni_utilizzate),
+        # quindi qui sotto si collegano davvero le partecipazioni al pacchetto
+        # invece di dichiarare un numero scollegato dalla realtà.
+        pacchetto_sofia, _ = Pacchetto.objects.get_or_create(
             allievo=allievi["Sofia Ricci"], tipo_pacchetto=pacchetto_8,
             defaults=dict(data_inizio=oggi - timedelta(days=5), data_scadenza=oggi + timedelta(days=25),
-                          lezioni_totali=8, lezioni_utilizzate=2),
+                          lezioni_totali=8),
         )
-        Pacchetto.objects.get_or_create(
+        pacchetto_marco, _ = Pacchetto.objects.get_or_create(
             allievo=allievi["Marco Gallo"], tipo_pacchetto=pacchetto_4,
             defaults=dict(data_inizio=oggi - timedelta(days=20), data_scadenza=oggi + timedelta(days=10),
-                          lezioni_totali=4, lezioni_utilizzate=4),  # esaurito
+                          lezioni_totali=4),
         )
         Pacchetto.objects.get_or_create(
             allievo=allievi["Elena Conti"], tipo_pacchetto=pacchetto_12,
             defaults=dict(data_inizio=oggi - timedelta(days=2), data_scadenza=oggi + timedelta(days=28),
-                          lezioni_totali=12, lezioni_utilizzate=1),
+                          lezioni_totali=12),
         )
 
         # --- Qualche lezione, passata e futura ---
@@ -173,7 +177,7 @@ class Command(BaseCommand):
         )
         Partecipazione.objects.get_or_create(
             lezione=lezione_passata, allievo=allievi["Sofia Ricci"],
-            defaults=dict(cavallo=cavalli["Luna"], stato=Partecipazione.Stato.SVOLTA),
+            defaults=dict(cavallo=cavalli["Luna"], stato=Partecipazione.Stato.SVOLTA, pacchetto=pacchetto_sofia),
         )
 
         lezione_gruppo, _ = Lezione.objects.get_or_create(
@@ -187,7 +191,7 @@ class Command(BaseCommand):
         )
         Partecipazione.objects.get_or_create(
             lezione=lezione_gruppo, allievo=allievi["Marco Gallo"],
-            defaults=dict(cavallo=cavalli["Ombra"]),
+            defaults=dict(cavallo=cavalli["Ombra"], pacchetto=pacchetto_marco),
         )
 
         lezione_ippoterapia, _ = Lezione.objects.get_or_create(

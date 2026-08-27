@@ -40,16 +40,19 @@ class LezioneForm(forms.ModelForm):
 
 
 class PacchettoSelect(forms.Select):
-    """Select per il pacchetto che espone l'allievo proprietario di ogni opzione.
+    """Select per il pacchetto che espone allievo e stato di ogni opzione.
 
-    Serve alla riga JS lato client per mostrare solo i pacchetti dell'allievo
-    scelto in quella stessa riga di partecipazione — la validazione vera
-    resta comunque server-side in PartecipazioneForm.clean(), questo è solo
-    per l'usabilità (evitare di dover cercare a occhio in un elenco di
-    pacchetti di TUTTI gli allievi).
+    Serve alla riga JS lato client per due cose: mostrare solo i pacchetti
+    dell'allievo scelto in quella riga di partecipazione, e pre-selezionare
+    da sola il pacchetto ATTIVO di quell'allievo quando ce n'è uno solo —
+    normalmente non c'è alcun motivo per cui la segreteria debba scegliere a
+    mano il pacchetto ogni volta, dato che un allievo ha in pratica sempre un
+    solo pacchetto attivo alla volta. La validazione vera resta comunque
+    server-side in PartecipazioneForm.clean(): questi attributi sono solo
+    per l'usabilità, non per la sicurezza dei dati.
 
-    La mappa pacchetto->allievo si interroga in `optgroups()`, non in
-    `__init__`: il widget è un'istanza condivisa a livello di classe (vive
+    La mappa pacchetto->(allievo, attivo) si interroga in `optgroups()`, non
+    in `__init__`: il widget è un'istanza condivisa a livello di classe (vive
     per tutta la vita del processo), quindi interrogare il DB nel costruttore
     la congelerebbe alla prima richiesta (pacchetti creati dopo non
     comparirebbero più) — oltre a rompere `manage.py migrate` su un database
@@ -57,15 +60,20 @@ class PacchettoSelect(forms.Select):
     """
 
     def optgroups(self, name, value, attrs=None):
-        self._allievo_per_pacchetto = dict(Pacchetto.objects.values_list("pk", "allievo_id"))
+        self._info_pacchetto = {
+            pk: (allievo_id, stato)
+            for pk, allievo_id, stato in Pacchetto.objects.values_list("pk", "allievo_id", "stato")
+        }
         return super().optgroups(name, value, attrs)
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
         pk = value.value if hasattr(value, "value") else value
-        allievo_id = getattr(self, "_allievo_per_pacchetto", {}).get(pk)
+        allievo_id, stato = getattr(self, "_info_pacchetto", {}).get(pk, (None, None))
         if allievo_id is not None:
             option["attrs"]["data-allievo"] = allievo_id
+            if stato == Pacchetto.Stato.ATTIVO:
+                option["attrs"]["data-attivo"] = "1"
         return option
 
 
