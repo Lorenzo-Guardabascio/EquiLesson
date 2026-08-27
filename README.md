@@ -161,13 +161,13 @@ on your system, just use the standard Django commands instead.
 
 - [x] Self-booking for students, toggleable by the admin
 - [x] Telegram notifications (WhatsApp scaffolded, unverified)
-- [ ] Structured health-due-dates for horses (vaccinations, farrier visits,
+- [x] Structured health-due-dates for horses (vaccinations, farrier visits,
       deworming) with automatic reminders
-- [ ] CSV/PDF export for reports
-- [ ] Read-only portal for boarding-horse owners
-- [ ] Privacy/liability consent with tracked acceptance (a timestamp, not
-      just a checkbox)
-- [ ] Digital membership card with QR code for students
+- [x] CSV/PDF export for reports
+- [x] Read-only portal for boarding-horse owners
+- [x] Privacy/liability consent with tracked acceptance (a timestamp, not
+      just a checkbox — not a qualified e-signature)
+- [x] Digital membership card with QR code for students
 - [x] Bilingual Italian/English interface (templates and view messages; admin labels still Italian-only)
 
 Possible future extensions (not blocking): a dedicated visual design pass,
@@ -394,11 +394,11 @@ di Django al suo posto.
 
 - [x] Prenotazione autonoma allievi, attivabile/disattivabile dall'admin
 - [x] Notifiche Telegram (WhatsApp predisposto, non verificato)
-- [ ] Scadenze sanitarie strutturate per i cavalli (vaccinazioni, ferrature, sverminazioni) con promemoria automatico
-- [ ] Export dei report in CSV/PDF
-- [ ] Portale di sola lettura per i proprietari di cavalli in pensione
-- [ ] Consenso privacy/liberatoria con tracciamento di accettazione (data, non solo una checkbox)
-- [ ] Tessera digitale con QR per gli allievi
+- [x] Scadenze sanitarie strutturate per i cavalli (vaccinazioni, ferrature, sverminazioni) con promemoria automatico
+- [x] Export dei report in CSV/PDF
+- [x] Portale di sola lettura per i proprietari di cavalli in pensione
+- [x] Consenso privacy/liberatoria con tracciamento di accettazione (data, non solo una checkbox — non è una firma digitale qualificata)
+- [x] Tessera digitale con QR per gli allievi
 - [x] Interfaccia bilingue italiano/inglese (template e messaggi delle view; etichette admin ancora solo in italiano)
 
 Estensioni future possibili (non bloccanti): rifinitura estetica dedicata,
