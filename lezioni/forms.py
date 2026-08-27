@@ -81,6 +81,13 @@ class PartecipazioneForm(forms.ModelForm):
             "note": forms.TextInput(attrs=INPUT_ATTRS),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Pacchetto.__str__ attraversa sia allievo che tipo_pacchetto: senza
+        # select_related, stampare tutte le opzioni di questo <select> (una
+        # per pacchetto esistente) costerebbe 2 query in più per ciascuna.
+        self.fields["pacchetto"].queryset = Pacchetto.objects.select_related("allievo", "tipo_pacchetto")
+
     def clean(self):
         cleaned = super().clean()
         allievo = cleaned.get("allievo")
