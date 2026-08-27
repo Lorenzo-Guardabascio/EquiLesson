@@ -1,27 +1,26 @@
 /*
- * Identità visiva di EquiLesson — seconda iterazione, in chiave più
- * dichiaratamente "moderna"/Material: forme più arrotondate, superfici
- * "tonali" invece di bianco+bordo grigio, elevazione vera (ombre a
- * più livelli) invece di un filo sottile, verde più acceso. La palette
- * resta legata al mondo del maneggio (verde bosco, non blu corporate),
- * ma il linguaggio visivo dei componenti ora richiama più da vicino
- * Material Design 3: pulsanti pieni "pill", chip arrotondati, campi
- * di input con sfondo tonale.
+ * Identità visiva di EquiLesson — terza iterazione: via l'effetto "a
+ * cubetti" della versione Material (pulsanti pillola, campi con
+ * riempimento tonale pieno ovunque) verso qualcosa di più fluido e
+ * rifinito, in linea con i pannelli SaaS moderni (Linear, Stripe,
+ * Vercel): superfici quasi bianche con un bordo sottile invece di
+ * blocchi di colore, angoli arrotondati ma moderati (non più pillole),
+ * ombre leggere e diffuse invece che "adesive", colore del brand usato
+ * con parsimonia (bottone primario, link, stati attivi) invece che
+ * dipinto su ogni singolo controllo. La palette resta la stessa (verde
+ * legato al maneggio), cambia il linguaggio dei componenti.
  *
  * Bootstrap qui è precompilato (bootstrap.min.css), non ricompilato da
  * SASS: i colori dei componenti sono valori esadecimali fissi nelle
- * singole regole (es. .btn-primary{--bs-btn-bg:#0d6efd}), non derivati
- * da --bs-primary. Per questo il retema ridefinisce le variabili
- * per-componente di ogni classe effettivamente usata nei template,
- * invece di limitarsi a un'unica variabile globale che non avrebbe
- * alcun effetto sui componenti già compilati.
+ * singole regole, non derivati da --bs-primary. Il retema ridefinisce
+ * le variabili per-componente di ogni classe effettivamente usata.
  */
 
 /* --- font auto-ospitati (nessun CDN esterno, come bootstrap/fullcalendar/choices) --- */
 @font-face {
     font-family: "Libre Franklin";
     font-style: normal;
-    font-weight: 100 900; /* font variabile: un solo file copre tutto l'asse dei pesi */
+    font-weight: 100 900;
     font-display: swap;
     src: url("../fonts/libre-franklin-variable.woff2") format("woff2");
 }
@@ -34,23 +33,24 @@
 }
 
 :root {
-    --brand: #2e7d46;          /* verde più acceso, non più il forest-green spento di prima */
-    --brand-strong: #1f5c33;   /* hover/active sui controlli primari */
-    --brand-soft: #e3f3e7;     /* superficie tonale: chip, campi di input, righe attive */
-    --brand-soft-strong: #c7e6cf; /* variante più satura della superficie tonale, per hover su elementi tonali */
-    --ink: #20241f;            /* testo principale */
-    --ink-soft: #5c6058;       /* testo secondario/muted */
-    --paper: #f7f8f5;          /* sfondo pagina */
-    --surface: #ffffff;        /* card/pannelli */
-    --line: #dfe3da;           /* bordi/separatori */
-    --rust: #a1552b;           /* accento secondario, uso mirato */
+    --brand: #2e7d46;
+    --brand-strong: #1f5c33;
+    --brand-soft: #eaf5ee;       /* solo per accenti puntuali, non più il riempimento di default dei campi */
+    --ink: #1c1f1b;
+    --ink-soft: #6b6f66;
+    --paper: #fafaf8;
+    --surface: #ffffff;
+    --line: #e6e4dc;             /* bordo di riposo, sottile */
+    --line-strong: #d3d0c5;      /* bordo su hover/elementi più in evidenza */
+    --rust: #a1552b;
 
-    --radius-sm: 0.6rem;   /* input, badge piccoli */
-    --radius-md: 1rem;     /* card, alert */
-    --radius-pill: 999px;  /* bottoni, chip di stato */
+    --radius: 0.65rem;           /* unico raggio per card/bottoni/campi: coerente, non più pillole */
+    --radius-sm: 0.5rem;
 
-    --elevation-1: 0 1px 2px rgba(20, 24, 19, 0.06), 0 2px 8px rgba(20, 24, 19, 0.06);
-    --elevation-2: 0 2px 4px rgba(20, 24, 19, 0.08), 0 6px 16px rgba(20, 24, 19, 0.1);
+    --shadow-rest: 0 1px 2px rgba(20, 24, 19, 0.04);
+    --shadow-hover: 0 4px 14px rgba(20, 24, 19, 0.09);
+
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
 
     --font-display: "Libre Franklin", "Segoe UI", Roboto, Arial, sans-serif;
     --font-body: "Public Sans", "Segoe UI", Roboto, Arial, sans-serif;
@@ -65,42 +65,51 @@ body {
 h1, h2, h3, h4, h5, h6,
 .navbar-brand, .card-title, .fs-2 {
     font-family: var(--font-display);
-    font-weight: 650;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.012em;
 }
 
 a {
     color: var(--brand);
+    transition: color 0.15s var(--ease);
 }
 a:hover {
     color: var(--brand-strong);
 }
 
-/* --- navbar: verde acceso, ombra invece del filo sottile di Bootstrap --- */
+/* --- navbar: pulita, ombra appena percettibile invece del filo netto --- */
 .navbar-dark.bg-dark {
-    background-color: var(--brand) !important;
-    box-shadow: var(--elevation-1);
+    background-color: var(--surface) !important;
+    box-shadow: 0 1px 0 var(--line);
+}
+.navbar-dark .navbar-brand {
+    color: var(--ink) !important;
 }
 .navbar-dark .navbar-nav .nav-link {
-    color: rgba(255, 255, 255, 0.85);
-    border-radius: var(--radius-pill);
-    padding-left: 0.9rem !important;
-    padding-right: 0.9rem !important;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    color: var(--ink-soft) !important;
+    border-radius: var(--radius-sm);
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
 }
 .navbar-dark .navbar-nav .nav-link:hover {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--ink) !important;
+    background-color: var(--paper);
+}
+.navbar-dark .navbar-toggler-icon {
+    filter: invert(1) grayscale(1);
+}
+.navbar-dark .text-light {
+    color: var(--ink-soft) !important;
 }
 
-/* --- pulsanti: pieni e "pill", con una vera elevazione al passaggio del mouse --- */
+/* --- pulsanti: rifiniti, non più pillole --- */
 .btn {
     font-family: var(--font-body);
     font-weight: 600;
-    border-radius: var(--radius-pill);
-    padding-left: 1.1rem;
-    padding-right: 1.1rem;
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    font-size: 0.9rem;
+    border-radius: var(--radius);
+    transition: box-shadow 0.15s var(--ease), border-color 0.15s var(--ease), background-color 0.15s var(--ease);
 }
 .btn-primary {
     --bs-btn-bg: var(--brand);
@@ -112,87 +121,89 @@ a:hover {
     --bs-btn-disabled-bg: var(--brand);
     --bs-btn-disabled-border-color: var(--brand);
     --bs-btn-focus-shadow-rgb: 46, 125, 70;
-    box-shadow: var(--elevation-1);
+    box-shadow: var(--shadow-rest);
 }
 .btn-primary:hover {
-    box-shadow: var(--elevation-2);
-    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
 }
 
-/* "tonale" alla Material invece del semplice contorno: sfondo verde
-   tenue, testo verde pieno, nessun bordo — non un pulsante secondario
-   qualunque, ma uno stato riconoscibile a colpo d'occhio */
+/* Secondari: quasi bianchi con un bordo sottile, non più blocchi di colore. */
 .btn-outline-primary {
     --bs-btn-color: var(--brand-strong);
-    --bs-btn-bg: var(--brand-soft);
-    --bs-btn-border-color: transparent;
+    --bs-btn-bg: var(--surface);
+    --bs-btn-border-color: var(--line-strong);
     --bs-btn-hover-color: var(--brand-strong);
-    --bs-btn-hover-bg: var(--brand-soft-strong);
-    --bs-btn-hover-border-color: transparent;
-    --bs-btn-active-bg: var(--brand-soft-strong);
-    --bs-btn-active-border-color: transparent;
+    --bs-btn-hover-bg: var(--brand-soft);
+    --bs-btn-hover-border-color: var(--brand);
+    --bs-btn-active-bg: var(--brand-soft);
+    --bs-btn-active-border-color: var(--brand);
     --bs-btn-disabled-color: var(--brand);
-    --bs-btn-disabled-border-color: transparent;
+    --bs-btn-disabled-border-color: var(--line);
 }
 .btn-outline-secondary {
     --bs-btn-color: var(--ink-soft);
-    --bs-btn-bg: #eceae3;
-    --bs-btn-border-color: transparent;
+    --bs-btn-bg: var(--surface);
+    --bs-btn-border-color: var(--line-strong);
     --bs-btn-hover-color: var(--ink);
-    --bs-btn-hover-bg: #e0ddd3;
-    --bs-btn-hover-border-color: transparent;
-    --bs-btn-active-bg: #e0ddd3;
-    --bs-btn-active-border-color: transparent;
+    --bs-btn-hover-bg: var(--paper);
+    --bs-btn-hover-border-color: var(--ink-soft);
+    --bs-btn-active-bg: var(--paper);
+    --bs-btn-active-border-color: var(--ink-soft);
 }
 .btn-outline-danger {
-    --bs-btn-bg: #fbe7e7;
-    --bs-btn-border-color: transparent;
-    --bs-btn-hover-bg: #f6d0d0;
-    --bs-btn-hover-border-color: transparent;
-    --bs-btn-active-bg: #f6d0d0;
-    --bs-btn-active-border-color: transparent;
+    --bs-btn-bg: var(--surface);
 }
 .btn-outline-light {
-    --bs-btn-hover-color: var(--brand);
-}
-.btn-danger {
-    box-shadow: var(--elevation-1);
+    --bs-btn-color: var(--ink-soft);
+    --bs-btn-border-color: var(--line-strong);
+    --bs-btn-hover-color: var(--ink);
+    --bs-btn-hover-bg: var(--paper);
 }
 
-/* --- form: campi "filled" alla Material, non più bianco+bordo grigio --- */
+/* --- form: bianco + bordo sottile, colore solo al focus --- */
 .form-control,
 .form-select {
-    background-color: var(--brand-soft);
-    border: 1.5px solid transparent;
+    background-color: var(--surface);
+    border: 1px solid var(--line-strong);
     border-radius: var(--radius-sm);
+    transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.form-control:hover,
+.form-select:hover {
+    border-color: var(--ink-soft);
 }
 .form-control:focus,
 .form-select:focus {
-    background-color: var(--surface);
     border-color: var(--brand);
-    box-shadow: 0 0 0 0.2rem rgba(46, 125, 70, 0.18);
+    box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.14);
 }
 .form-label {
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
 }
-/* Choices.js eredita lo stesso trattamento "filled" dei campi nativi */
+/* Choices.js eredita lo stesso trattamento dei campi nativi */
 .choices__inner {
-    background-color: var(--brand-soft) !important;
-    border-color: transparent !important;
+    background-color: var(--surface) !important;
+    border-color: var(--line-strong) !important;
     border-radius: var(--radius-sm) !important;
+    transition: border-color 0.15s var(--ease);
 }
 .choices.is-focused .choices__inner {
-    background-color: var(--surface) !important;
     border-color: var(--brand) !important;
-    box-shadow: 0 0 0 0.2rem rgba(46, 125, 70, 0.18);
+    box-shadow: 0 0 0 3px rgba(46, 125, 70, 0.14);
+}
+.choices__list--dropdown {
+    border-color: var(--line-strong) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-hover);
 }
 
-/* --- card: elevazione vera, angoli più morbidi --- */
+/* --- card: bordo sottile + ombra appena percettibile, niente blocchi --- */
 .card {
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow: var(--elevation-1);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-rest);
 }
 .card-title {
     color: var(--ink);
@@ -205,9 +216,9 @@ a:hover {
 .table thead th {
     font-family: var(--font-body);
     font-weight: 600;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     color: var(--ink-soft);
     border-bottom-width: 1px;
 }
@@ -218,21 +229,70 @@ a:hover {
     border-width: 0 0 1px;
 }
 
-/* --- badge: chip arrotondati alla Material invece del rettangolo di Bootstrap --- */
+/* --- badge: raggio coerente col resto, non più chip a pillola --- */
 .badge {
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    padding: 0.4em 0.75em;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.38em 0.6em;
 }
 
-/* --- alert: superficie tonale coerente col resto --- */
+/* --- alert --- */
 .alert {
-    border-radius: var(--radius-md);
-    border: none;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
 }
 .alert-light {
     background-color: var(--brand-soft);
+    border-color: #d5e9da;
     color: var(--ink);
+}
+
+/* --- FullCalendar: stesso linguaggio visivo del resto (bordi sottili,
+   verde del brand, niente blu/ombre di default), non un widget a parte --- */
+.fc {
+    --fc-border-color: var(--line);
+    --fc-button-bg-color: var(--surface);
+    --fc-button-border-color: var(--line-strong);
+    --fc-button-text-color: var(--ink);
+    --fc-button-hover-bg-color: var(--paper);
+    --fc-button-hover-border-color: var(--ink-soft);
+    --fc-button-hover-text-color: var(--ink);
+    --fc-button-active-bg-color: var(--brand-soft);
+    --fc-button-active-border-color: var(--brand);
+    --fc-button-active-text-color: var(--brand-strong);
+    --fc-today-bg-color: var(--brand-soft);
+    --fc-event-bg-color: var(--brand);
+    --fc-event-border-color: var(--brand);
+    --fc-event-text-color: #ffffff;
+    --fc-page-bg-color: var(--surface);
+    --fc-neutral-bg-color: var(--paper);
+    font-family: var(--font-body);
+}
+.fc .fc-button {
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: none;
+    box-shadow: none !important;
+    transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.fc .fc-toolbar-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+}
+.fc-event {
+    border-radius: var(--radius-sm);
+    border: none;
+    padding: 1px 5px;
+}
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion,
+.fc-timegrid-slot-label-cushion {
+    color: var(--ink-soft);
+    text-decoration: none;
 }
 
 /* --- footer discreto --- */
