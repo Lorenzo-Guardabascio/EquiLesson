@@ -2,6 +2,7 @@ asgiref==3.12.1
 Django==5.2.17
 django-admin-interface==0.32.0
 django-colorfield==0.14.0
+filetype==1.2.0
 pillow==12.3.0
 polib==1.2.0
 psycopg2-binary==2.9.12

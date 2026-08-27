@@ -206,6 +206,20 @@ exposed to others over a network.
 The system handles sensitive data (medical certificates, data belonging to
 minors). To responsibly report a vulnerability, see [SECURITY.md](SECURITY.md).
 
+What's already in place: uploaded documents are validated by content (not
+just filename extension) for type and size; `SECRET_KEY`/HTTPS/cookie
+security settings are enforced automatically once `DEBUG=False`; security
+events are logged to `logs/sicurezza.log`. Two things deliberately **not**
+done yet, worth doing before a real internet-facing deployment:
+
+- **No login rate-limiting**: nothing currently blocks repeated failed
+  login attempts. Consider a package like `django-axes` if the instance
+  will ever be reachable from the open internet rather than a home/local
+  network.
+- **`CSRF_TRUSTED_ORIGINS`** isn't set: add it once a real production
+  domain exists (see Django's docs on this setting when deploying behind
+  a reverse proxy).
+
 ## Contributing
 
 Contributions, bug reports and proposals are welcome: see
@@ -422,6 +436,21 @@ senza esporlo ad altri via rete.
 
 Il sistema tratta dati sensibili (certificati medici, dati di minorenni).
 Per segnalare una vulnerabilità in modo responsabile vedi [SECURITY.md](SECURITY.md).
+
+Cosa c'è già: i documenti caricati sono validati sul contenuto reale (non solo
+sull'estensione del nome file) per tipo e dimensione; le impostazioni di
+sicurezza per SECRET_KEY/HTTPS/cookie si attivano automaticamente appena
+`DEBUG=False`; gli eventi di sicurezza vengono loggati in
+`logs/sicurezza.log`. Due cose volutamente **non** ancora fatte, da
+considerare prima di un'esposizione reale su internet:
+
+- **Nessun rate-limiting sul login**: niente blocca al momento tentativi di
+  accesso ripetuti. Da valutare un pacchetto come `django-axes` se
+  l'istanza sarà mai raggiungibile da internet aperto invece che da una
+  rete domestica/locale.
+- **`CSRF_TRUSTED_ORIGINS`** non è impostato: va aggiunto quando esisterà un
+  dominio di produzione reale (vedi la documentazione Django su questa
+  impostazione quando si è dietro un reverse proxy).
 
 ## Contribuire
 

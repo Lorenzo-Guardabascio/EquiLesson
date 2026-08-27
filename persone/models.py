@@ -3,6 +3,8 @@ from datetime import date
 from django.conf import settings
 from django.db import models
 
+from .validators import valida_dimensione_documento, valida_tipo_documento
+
 
 class Tutore(models.Model):
     """Genitore/tutore di un allievo minorenne."""
@@ -159,7 +161,11 @@ class Documento(models.Model):
 
     allievo = models.ForeignKey(Allievo, on_delete=models.CASCADE, related_name="documenti")
     tipo = models.CharField(max_length=30, choices=TipoDocumento.choices, default=TipoDocumento.ALTRO)
-    file = models.FileField(upload_to="documenti/%Y/%m/")
+    file = models.FileField(
+        upload_to="documenti/%Y/%m/",
+        validators=[valida_tipo_documento, valida_dimensione_documento],
+        help_text="Solo PDF o immagini (JPG/PNG), max 10 MB.",
+    )
     caricato_il = models.DateTimeField(auto_now_add=True)
     note = models.CharField(max_length=255, blank=True)
 

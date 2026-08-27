@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,6 +32,34 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-only-change-me')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [h for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h]
+
+if not DEBUG and SECRET_KEY == 'django-insecure-dev-only-change-me':
+    raise ImproperlyConfigured(
+        'SECRET_KEY non impostata: con DEBUG=False va messa una chiave vera nel .env, '
+        'non lasciata al valore di sviluppo di default.'
+    )
+
+# Impostazioni di sicurezza aggiuntive quando non si è in sviluppo (DEBUG=False):
+# presuppongono un reverse proxy HTTPS davanti a Django (Caddy, come da
+# architettura di deploy pianificata) — vedi README. In sviluppo locale
+# (DEBUG=True) restano disattivate, altrimenti l'accesso via HTTP semplice
+# smetterebbe di funzionare.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 anno
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    # Il proxy termina TLS e inoltra a Django in HTTP semplice: senza questo,
+    # Django non saprebbe che la richiesta originale era HTTPS e andrebbe in
+    # loop di redirect con SECURE_SSL_REDIRECT. Sicuro SOLO perché c'è sempre
+    # un proxy fidato davanti — se Django fosse mai esposto direttamente,
+    # andrebbe rimosso (altrimenti chiunque potrebbe falsificare l'header).
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -153,6 +182,50 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Log degli eventi di sicurezza (host non consentito, CSRF fallito, errori
+# 500...) su file, non solo sulla console del server — prima non c'era
+# nessuna configurazione di logging, quindi questi eventi sparivano non
+# appena il terminale di runserver veniva chiuso o rimpiazzato.
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file_sicurezza': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGS_DIR / 'sicurezza.log',
+            'maxBytes': 5 * 1024 * 1024,
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['console', 'file_sicurezza'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console', 'file_sicurezza'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
 
 LOGIN_URL = 'core:login'
 LOGIN_REDIRECT_URL = 'core:home'

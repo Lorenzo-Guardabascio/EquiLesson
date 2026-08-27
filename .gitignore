@@ -5,6 +5,7 @@ db.sqlite3
 .env
 media/
 staticfiles/
+logs/
 
 # Config/strumenti dell'editor locale: restano sul disco per lo sviluppo ma
 # non vanno mai in git (né nel repo privato né tantomeno nel repo pubblico).
