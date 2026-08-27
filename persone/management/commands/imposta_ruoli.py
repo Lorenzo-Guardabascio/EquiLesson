@@ -16,15 +16,17 @@ from django.core.management.base import BaseCommand
 
 from persone.models import Allievo, Istruttore, Proprietario
 
-# Gli istruttori possono vedere e gestire lezioni/partecipazioni...
-ISTRUTTORI_GESTIONE = [
-    ("lezioni", "lezione"),
-    ("lezioni", "partecipazione"),
-]
-# ...ma solo consultare il resto (allievi, cavalli, pacchetti, configurazioni).
+# Le lezioni/partecipazioni si gestiscono SOLO dal form custom in /lezioni/
+# (che richiede solo is_staff, non un permesso specifico) — l'admin di
+# Django su questi due modelli è sola consultazione per chiunque (vedi
+# lezioni.admin.SolaConsultazioneMixin), quindi anche gli istruttori hanno
+# qui solo il permesso di vedere, mai di scrivere.
+ISTRUTTORI_GESTIONE = []
 ISTRUTTORI_SOLA_LETTURA = [
     ("persone", "allievo"),
     ("cavalli", "cavallo"),
+    ("lezioni", "lezione"),
+    ("lezioni", "partecipazione"),
     ("lezioni", "campo"),
     ("lezioni", "tipolezione"),
     ("pacchetti", "pacchetto"),

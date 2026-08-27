@@ -1,8 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from pacchetti.models import Pacchetto
-
 from .models import Lezione, Partecipazione
 
 SELECT_ATTRS = {"class": "form-select"}
@@ -39,74 +37,20 @@ class LezioneForm(forms.ModelForm):
         }
 
 
-class PacchettoSelect(forms.Select):
-    """Select per il pacchetto che espone allievo e stato di ogni opzione.
-
-    Serve alla riga JS lato client per due cose: mostrare solo i pacchetti
-    dell'allievo scelto in quella riga di partecipazione, e pre-selezionare
-    da sola il pacchetto ATTIVO di quell'allievo quando ce n'è uno solo —
-    normalmente non c'è alcun motivo per cui la segreteria debba scegliere a
-    mano il pacchetto ogni volta, dato che un allievo ha in pratica sempre un
-    solo pacchetto attivo alla volta. La validazione vera resta comunque
-    server-side in PartecipazioneForm.clean(): questi attributi sono solo
-    per l'usabilità, non per la sicurezza dei dati.
-
-    La mappa pacchetto->(allievo, attivo) si interroga in `optgroups()`, non
-    in `__init__`: il widget è un'istanza condivisa a livello di classe (vive
-    per tutta la vita del processo), quindi interrogare il DB nel costruttore
-    la congelerebbe alla prima richiesta (pacchetti creati dopo non
-    comparirebbero più) — oltre a rompere `manage.py migrate` su un database
-    ancora vuoto, dato che il modulo si importa prima che le tabelle esistano.
-    """
-
-    def optgroups(self, name, value, attrs=None):
-        self._info_pacchetto = {
-            pk: (allievo_id, stato)
-            for pk, allievo_id, stato in Pacchetto.objects.values_list("pk", "allievo_id", "stato")
-        }
-        return super().optgroups(name, value, attrs)
-
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super().create_option(name, value, label, selected, index, subindex, attrs)
-        pk = value.value if hasattr(value, "value") else value
-        allievo_id, stato = getattr(self, "_info_pacchetto", {}).get(pk, (None, None))
-        if allievo_id is not None:
-            option["attrs"]["data-allievo"] = allievo_id
-            if stato == Pacchetto.Stato.ATTIVO:
-                option["attrs"]["data-attivo"] = "1"
-        return option
-
-
 class PartecipazioneForm(forms.ModelForm):
+    # Niente campo pacchetto: un pacchetto è un blocco di N lezioni con una
+    # finestra di validità, non qualcosa da collegare lezione per lezione. Il
+    # consumo si calcola da solo (vedi Pacchetto.lezioni_utilizzate) dalla
+    # data della lezione e dall'allievo, senza bisogno di alcuna scelta qui.
     class Meta:
         model = Partecipazione
-        fields = ["allievo", "cavallo", "pacchetto", "stato", "note"]
+        fields = ["allievo", "cavallo", "stato", "note"]
         widgets = {
-            "allievo": forms.Select(attrs={**SELECT_ATTRS, "data-searchable": "true", "data-role": "allievo"}),
+            "allievo": forms.Select(attrs={**SELECT_ATTRS, "data-searchable": "true"}),
             "cavallo": forms.Select(attrs={**SELECT_ATTRS, "data-searchable": "true"}),
-            "pacchetto": PacchettoSelect(attrs={**SELECT_ATTRS, "data-role": "pacchetto"}),
             "stato": forms.Select(attrs=SELECT_ATTRS),
             "note": forms.TextInput(attrs=INPUT_ATTRS),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Pacchetto.__str__ attraversa sia allievo che tipo_pacchetto: senza
-        # select_related, stampare tutte le opzioni di questo <select> (una
-        # per pacchetto esistente) costerebbe 2 query in più per ciascuna.
-        self.fields["pacchetto"].queryset = Pacchetto.objects.select_related("allievo", "tipo_pacchetto")
-
-    def clean(self):
-        cleaned = super().clean()
-        allievo = cleaned.get("allievo")
-        pacchetto = cleaned.get("pacchetto")
-        if allievo and pacchetto and pacchetto.allievo_id != allievo.pk:
-            self.add_error(
-                "pacchetto",
-                f"Questo pacchetto appartiene a {pacchetto.allievo}, non a {allievo}: "
-                "sceglierne uno dell'allievo selezionato.",
-            )
-        return cleaned
 
 
 PartecipazioneFormSet = inlineformset_factory(

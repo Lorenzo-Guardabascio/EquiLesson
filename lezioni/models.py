@@ -97,13 +97,6 @@ class Partecipazione(models.Model):
     cavallo = models.ForeignKey(
         Cavallo, on_delete=models.SET_NULL, null=True, blank=True, related_name="partecipazioni"
     )
-    pacchetto = models.ForeignKey(
-        "pacchetti.Pacchetto",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="partecipazioni",
-    )
     stato = models.CharField(max_length=15, choices=Stato.choices, default=Stato.PREVISTA)
     note = models.CharField(max_length=255, blank=True)
 

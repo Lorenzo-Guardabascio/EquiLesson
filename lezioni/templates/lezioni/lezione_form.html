@@ -84,17 +84,13 @@
                 {% for pform in formset %}
                 <div class="row g-2 align-items-start border-bottom pb-2 mb-2 partecipazione-row">
                     {% for hidden in pform.hidden_fields %}{{ hidden }}{% endfor %}
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         {% if forloop.first %}<label class="form-label small">{% trans "Allievo" %}</label>{% endif %}
                         {{ pform.allievo }}
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         {% if forloop.first %}<label class="form-label small">{% trans "Cavallo" %}</label>{% endif %}
                         {{ pform.cavallo }}
-                    </div>
-                    <div class="col-sm-2">
-                        {% if forloop.first %}<label class="form-label small">{% trans "Pacchetto" %}</label>{% endif %}
-                        {{ pform.pacchetto }}
                     </div>
                     <div class="col-sm-2">
                         {% if forloop.first %}<label class="form-label small">{% trans "Stato" %}</label>{% endif %}
@@ -130,7 +126,6 @@
     <div class="row g-2 align-items-start border-bottom pb-2 mb-2 partecipazione-row">
         {{ formset.empty_form.allievo }}
         {{ formset.empty_form.cavallo }}
-        {{ formset.empty_form.pacchetto }}
         {{ formset.empty_form.stato }}
         {{ formset.empty_form.note }}
     </div>
@@ -164,77 +159,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return istanza;
     }
 
-    // Il pacchetto scelto in una riga deve appartenere all'allievo di quella
-    // stessa riga: qui si filtrano le opzioni visibili (la validazione vera
-    // resta comunque server-side in PartecipazioneForm.clean()). In più: se
-    // l'allievo ha esattamente un pacchetto attivo e la riga non ha già una
-    // scelta esplicita, lo si preseleziona da soli — non c'è motivo per cui
-    // la segreteria debba scegliere a mano il pacchetto praticamente ogni
-    // volta, dato che un allievo ha in pratica sempre un solo pacchetto
-    // attivo alla volta. Se sono zero o più di uno resta vuoto: sceglierlo
-    // in quel caso è una decisione reale, non un automatismo sicuro.
-    function opzioniPacchettoPerAllievo(selectPacchetto, allievoId) {
-        // Legge dalla copia originale catturata in inizializzaRiga, MAI dal
-        // <select> live: setChoices(..., true) sotto sostituisce le opzioni
-        // reali del <select> sottostante con quelle filtrate, quindi rileggere
-        // da lì al filtro successivo troverebbe solo quello che è sopravvissuto
-        // all'ultimo filtro — i pacchetti esclusi sarebbero persi per sempre,
-        // non solo nascosti (bug reale, trovato testando con un browser vero:
-        // al caricamento pagina, con allievo ancora vuoto, il primo filtro
-        // svuotava la select cancellando tutti i pacchetti che c'erano).
-        var originali = selectPacchetto._opzioniOriginali || [];
-        var opzioni = [];
-        var giaSelezionato = false;
-        var candidatoAttivo = null;
-        originali.forEach(function (opt) {
-            var appartieneAllievo = !opt.allievo || opt.value === '' || opt.allievo === allievoId;
-            if (!appartieneAllievo) return;
-            if (opt.selected && opt.value !== '') giaSelezionato = true;
-            if (opt.attivo === '1' && opt.allievo === allievoId) {
-                candidatoAttivo = candidatoAttivo === null ? opt.value : false;
-            }
-            opzioni.push({ value: opt.value, label: opt.label, selected: opt.selected });
-        });
-        if (!giaSelezionato && candidatoAttivo) {
-            opzioni.forEach(function (o) { o.selected = (o.value === candidatoAttivo); });
-        }
-        return opzioni;
-    }
-
-    function aggiornaPacchettiRiga(riga) {
-        var selectAllievo = riga.querySelector('[data-role="allievo"]');
-        var selectPacchetto = riga.querySelector('[data-role="pacchetto"]');
-        if (!selectAllievo || !selectPacchetto) return;
-        var istanzaPacchetto = istanzeChoices.get(selectPacchetto);
-        if (!istanzaPacchetto) return;
-        istanzaPacchetto.setChoices(
-            opzioniPacchettoPerAllievo(selectPacchetto, selectAllievo.value), 'value', 'label', true
-        );
-    }
-
     function inizializzaRiga(riga) {
         riga.querySelectorAll('select[data-searchable="true"]').forEach(inizializzaSearchable);
-        var selectPacchetto = riga.querySelector('[data-role="pacchetto"]');
-        if (selectPacchetto) {
-            inizializzaSearchable(selectPacchetto);
-            if (!selectPacchetto._opzioniOriginali) {
-                selectPacchetto._opzioniOriginali = Array.prototype.map.call(
-                    selectPacchetto.querySelectorAll('option'),
-                    function (opt) {
-                        return {
-                            value: opt.value, label: opt.textContent,
-                            allievo: opt.dataset.allievo, attivo: opt.dataset.attivo,
-                            selected: opt.selected,
-                        };
-                    }
-                );
-            }
-        }
-        var selectAllievo = riga.querySelector('[data-role="allievo"]');
-        if (selectAllievo) {
-            selectAllievo.addEventListener('change', function () { aggiornaPacchettiRiga(riga); });
-        }
-        aggiornaPacchettiRiga(riga);
     }
 
     // idempotente: inizializzaSearchable salta chi è già in istanzeChoices
@@ -250,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var riga = wrapper.firstElementChild;
         // colonne coerenti con le righe esistenti
         var cols = riga.querySelectorAll('select, input');
-        var wrappers = ['col-sm-3', 'col-sm-3', 'col-sm-2', 'col-sm-2', 'col-sm-1'];
+        var wrappers = ['col-sm-4', 'col-sm-4', 'col-sm-2', 'col-sm-1'];
         cols.forEach(function (el, i) {
             var col = document.createElement('div');
             col.className = wrappers[i] || 'col-sm-2';

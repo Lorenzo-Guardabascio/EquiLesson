@@ -57,17 +57,22 @@ class Pacchetto(models.Model):
     @property
     def lezioni_utilizzate(self):
         """Quante lezioni ha già consumato: calcolato, non un contatore salvato
-        a mano. Prima era un campo che nessuna parte del codice aggiornava mai
-        — si poteva collegare un pacchetto a una partecipazione e il conteggio
-        non si muoveva di una virgola. Contando dalle partecipazioni vere non
-        può più disallinearsi dalla realtà: conta come "usata" una lezione
-        svolta o un'assenza (il cavallo/istruttore/orario erano comunque
-        stati riservati), non una lezione ancora prevista o annullata.
+        a mano né un collegamento esplicito da scegliere lezione per lezione.
+
+        Un pacchetto è un blocco di N lezioni con una finestra di validità:
+        conta come "usata" ogni lezione svolta o un'assenza (il cavallo/
+        istruttore/orario erano comunque stati riservati) di quell'allievo la
+        cui data cade dentro [data_inizio, data_scadenza] — non serve altro.
+        Un allievo ha un solo pacchetto attivo alla volta, quindi non c'è
+        ambiguità possibile su quale pacchetto "copra" una lezione.
         """
         from lezioni.models import Partecipazione
 
-        return self.partecipazioni.filter(
-            stato__in=[Partecipazione.Stato.SVOLTA, Partecipazione.Stato.ASSENTE]
+        return Partecipazione.objects.filter(
+            allievo=self.allievo,
+            stato__in=[Partecipazione.Stato.SVOLTA, Partecipazione.Stato.ASSENTE],
+            lezione__data__gte=self.data_inizio,
+            lezione__data__lte=self.data_scadenza,
         ).count()
 
     @property
