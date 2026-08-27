@@ -1,11 +1,18 @@
 from datetime import timedelta
 
-from django.shortcuts import render
+from django import forms
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from cavalli.models import Cavallo
 from lezioni.models import Lezione
 from persone.models import Allievo
+
+from .models import Impostazioni
 
 
 def home(request):
@@ -25,3 +32,35 @@ def home(request):
             ).order_by("certificato_medico_scadenza")[:5],
         )
     return render(request, "core/home.html", context)
+
+
+class ImpostazioniForm(forms.ModelForm):
+    class Meta:
+        model = Impostazioni
+        fields = [
+            "prenotazione_autonoma_abilitata",
+            "email_notifiche_staff",
+            "notifiche_telegram_abilitate",
+            "notifiche_whatsapp_abilitate",
+        ]
+        widgets = {
+            "prenotazione_autonoma_abilitata": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "email_notifiche_staff": forms.EmailInput(attrs={"class": "form-control"}),
+            "notifiche_telegram_abilitate": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "notifiche_whatsapp_abilitate": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+
+@staff_member_required
+@permission_required("core.change_impostazioni", raise_exception=True)
+def impostazioni_form(request):
+    istanza = Impostazioni.get()
+    if request.method == "POST":
+        form = ImpostazioniForm(request.POST, instance=istanza)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Impostazioni salvate."))
+            return redirect("core:impostazioni")
+    else:
+        form = ImpostazioniForm(instance=istanza)
+    return render(request, "core/impostazioni_form.html", {"form": form})

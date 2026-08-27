@@ -1,0 +1,13 @@
+{% extends "core/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Elimina" %} {{ voce.etichetta_singolare }} - {% trans "Gestionale maneggio" %}{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">{% blocktrans with elemento=oggetto %}Eliminare "{{ elemento }}"?{% endblocktrans %}</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">{% trans "Sì, elimina" %}</button>
+    <a href="{% url 'core:gestione_lista' slug=voce.slug %}" class="btn btn-outline-secondary">{% trans "Annulla" %}</a>
+</form>
+{% endblock %}

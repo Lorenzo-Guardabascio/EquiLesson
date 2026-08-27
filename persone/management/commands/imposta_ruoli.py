@@ -33,6 +33,32 @@ ISTRUTTORI_SOLA_LETTURA = [
     ("pacchetti", "tipopacchetto"),
 ]
 
+# La segreteria gestisce tutto il resto dal frontend (vedi core.gestione e
+# core.gestione_config.REGISTRO — sono apposta le stesse app/model label
+# usate lì): add/change/delete/view su tutta l'anagrafica e la
+# configurazione. Le lezioni non servono qui: is_staff basta già per il
+# form custom, che non controlla permessi granulari.
+SEGRETERIA_GESTIONE = [
+    ("persone", "allievo"),
+    ("persone", "tutore"),
+    ("persone", "istruttore"),
+    ("persone", "proprietario"),
+    ("persone", "documento"),
+    ("cavalli", "cavallo"),
+    ("cavalli", "scadenzasanitaria"),
+    ("pacchetti", "pacchetto"),
+    ("pacchetti", "tipopacchetto"),
+    ("lezioni", "campo"),
+    ("lezioni", "tipolezione"),
+    ("comunicazioni", "comunicazione"),
+]
+# Sola lettura anche per la segreteria: sono log di sistema (vedi
+# comunicazioni/views.py e admin.py), non anagrafica da modificare a mano.
+SEGRETERIA_SOLA_LETTURA = [
+    ("comunicazioni", "notificainviata"),
+    ("comunicazioni", "telegramlink"),
+]
+
 
 def genera_password():
     alfabeto = string.ascii_letters + string.digits
@@ -41,8 +67,8 @@ def genera_password():
 
 class Command(BaseCommand):
     help = (
-        "Crea i gruppi Istruttori/Allievi/Proprietari con i permessi di base e gli "
-        "account di accesso mancanti per istruttori, allievi attivi e proprietari."
+        "Crea i gruppi Istruttori/Segreteria/Allievi/Proprietari con i permessi di base "
+        "e gli account di accesso mancanti per istruttori, allievi attivi e proprietari."
     )
 
     def handle(self, *args, **options):
@@ -62,6 +88,28 @@ class Command(BaseCommand):
         istruttori_group.permissions.set(permessi)
         self.stdout.write(self.style.SUCCESS(
             f"Gruppo 'Istruttori' impostato con {istruttori_group.permissions.count()} permessi."
+        ))
+
+        segreteria_group, _ = Group.objects.get_or_create(name="Segreteria")
+        permessi_segreteria = []
+        for app_label, model in SEGRETERIA_GESTIONE:
+            for azione in ["view", "add", "change", "delete"]:
+                permessi_segreteria.append(Permission.objects.get(
+                    codename=f"{azione}_{model}", content_type__app_label=app_label
+                ))
+        for app_label, model in SEGRETERIA_SOLA_LETTURA:
+            permessi_segreteria.append(Permission.objects.get(
+                codename=f"view_{model}", content_type__app_label=app_label
+            ))
+        permessi_segreteria.append(
+            Permission.objects.get(codename="change_impostazioni", content_type__app_label="core")
+        )
+        segreteria_group.permissions.set(permessi_segreteria)
+        self.stdout.write(self.style.SUCCESS(
+            f"Gruppo 'Segreteria' impostato con {segreteria_group.permissions.count()} permessi. "
+            "Nessun account creato automaticamente: la segreteria non ha un modello anagrafico "
+            "proprio (a differenza di istruttori/allievi/proprietari) — il sistemista crea gli "
+            "account dall'admin tecnico (is_staff attivo, gruppo 'Segreteria')."
         ))
 
         # Allievi e Proprietari: nessun permesso admin (i gruppi esistono solo per

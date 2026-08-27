@@ -1,0 +1,33 @@
+{% extends "core/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Nuova comunicazione" %} - {% trans "Gestionale maneggio" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{% trans "Nuova comunicazione" %}</h1>
+    <a href="{% url 'comunicazioni:lista' %}" class="btn btn-outline-secondary btn-sm">&larr; {% trans "Comunicazioni" %}</a>
+</div>
+
+<div class="alert alert-warning">{% trans "Viene inviata subito a tutti gli allievi attivi (email e, se collegato, Telegram): non è più modificabile dopo l'invio." %}</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" for="{{ form.oggetto.id_for_label }}">{{ form.oggetto.label }}</label>
+                {{ form.oggetto }}
+                {{ form.oggetto.errors }}
+            </div>
+            <div class="mb-0">
+                <label class="form-label" for="{{ form.corpo.id_for_label }}">{{ form.corpo.label }}</label>
+                {{ form.corpo }}
+                {{ form.corpo.errors }}
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">{% trans "Invia" %}</button>
+</form>
+{% endblock %}

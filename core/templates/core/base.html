@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% trans "Gestionale maneggio" %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/choices/choices.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
     <style>
         main { min-height: 70vh; }
@@ -26,7 +27,31 @@
                     {% if user.is_staff %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'lezioni:calendario' %}">{% trans "Calendario" %}</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'report:report' %}">{% trans "Report" %}</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/">{% trans "Amministrazione" %}</a></li>
+                    {% if gruppi_gestione_nav or perms.comunicazioni.view_comunicazione or perms.core.change_impostazioni %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% trans "Gestione" %}</a>
+                        <ul class="dropdown-menu">
+                            {% for gruppo, voci in gruppi_gestione_nav.items %}
+                            {% if not forloop.first %}<li><hr class="dropdown-divider"></li>{% endif %}
+                            <li><h6 class="dropdown-header">{{ gruppo }}</h6></li>
+                            {% for voce in voci %}
+                            <li><a class="dropdown-item" href="{% url 'core:gestione_lista' slug=voce.slug %}">{{ voce.etichetta }}</a></li>
+                            {% endfor %}
+                            {% endfor %}
+                            {% if perms.comunicazioni.view_comunicazione %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'comunicazioni:lista' %}">{% trans "Comunicazioni" %}</a></li>
+                            {% endif %}
+                            {% if perms.core.change_impostazioni %}
+                            {% if not gruppi_gestione_nav and not perms.comunicazioni.view_comunicazione %}<li><hr class="dropdown-divider"></li>{% endif %}
+                            <li><a class="dropdown-item" href="{% url 'core:impostazioni' %}">{% trans "Impostazioni" %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                    <li class="nav-item"><a class="nav-link" href="/admin/">{% trans "Amministrazione tecnica" %}</a></li>
+                    {% endif %}
                     {% elif user.allievo %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'persone:portale' %}">{% trans "Le mie lezioni" %}</a></li>
                     {% elif user.proprietario %}
@@ -80,5 +105,37 @@
     </footer>
 
     <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/choices/choices.min.js' %}"></script>
+    <script>
+        // Inizializza Choices.js su OGNI <select data-searchable="true"> della
+        // pagina — centralizzato qui invece che ripetuto in ogni template coi
+        // form, così un menu a tendina nuovo ha la ricerca di default e non per
+        // essersene ricordati (vedi core/gestione.py::_formfield_callback, che
+        // aggiunge l'attributo a qualunque select generato).
+        window.equilesson = window.equilesson || {};
+        (function () {
+            var istanze = new WeakMap();
+            function inizializza(el) {
+                if (istanze.has(el)) return istanze.get(el);
+                var istanza = new Choices(el, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    shouldSort: false,
+                    allowHTML: false,
+                    placeholder: true,
+                    placeholderValue: '— {% trans "seleziona" %} —',
+                });
+                istanze.set(el, istanza);
+                return istanza;
+            }
+            // Esposta per chi aggiunge righe dinamicamente via JS (es. il form
+            // lezione) e deve inizializzare un select apparso dopo il caricamento.
+            window.equilesson.inizializzaSearchable = inizializza;
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('select[data-searchable="true"]').forEach(inizializza);
+            });
+        })();
+    </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

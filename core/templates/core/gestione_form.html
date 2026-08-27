@@ -1,0 +1,67 @@
+{% extends "core/base.html" %}
+{% load i18n %}
+
+{% block title %}{% if istanza %}{% trans "Modifica" %}{% else %}{% trans "Nuovo" %}{% endif %} {{ voce.etichetta_singolare }} - {% trans "Gestionale maneggio" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{% if istanza %}{% trans "Modifica" %}{% else %}{% trans "Nuovo" %}{% endif %} {{ voce.etichetta_singolare }}</h1>
+    <a href="{% url 'core:gestione_lista' slug=voce.slug %}" class="btn btn-outline-secondary btn-sm">&larr; {{ voce.etichetta }}</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                {% for field in form %}
+                <div class="col-md-6">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                    <div class="form-check mt-4">
+                        {{ field }}
+                        <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                    {% else %}
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                    {% endif %}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if formset %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-3">{{ voce.inline.etichetta }}</h2>
+            {% if formset.non_form_errors %}
+            <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+            {% endif %}
+            {{ formset.management_form }}
+            {% for subform in formset %}
+            <div class="row g-2 align-items-start border-bottom pb-2 mb-2">
+                {% for field in subform.visible_fields %}
+                <div class="col">
+                    {% if forloop.parentloop.first %}<label class="form-label small text-muted d-block">{{ field.label }}</label>{% endif %}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+                {% for hidden in subform.hidden_fields %}{{ hidden }}{% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">{% trans "Salva" %}</button>
+</form>
+{% endblock %}

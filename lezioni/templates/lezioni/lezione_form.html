@@ -3,15 +3,6 @@
 
 {% block title %}{{ titolo }}{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'vendor/choices/choices.min.css' %}">
-<style>
-    /* Allinea l'aspetto di Choices.js ai controlli Bootstrap circostanti. */
-    .choices__inner { border-radius: .375rem; min-height: calc(1.5em + .75rem + 2px); padding: .3rem .75rem; }
-    .choices.is-focused .choices__inner { border-color: #86b7fe; box-shadow: 0 0 0 .25rem rgba(13,110,253,.25); }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">{{ titolo }}</h1>
@@ -130,8 +121,9 @@
         {{ formset.empty_form.note }}
     </div>
 </template>
+{% endblock %}
 
-<script src="{% static 'vendor/choices/choices.min.js' %}"></script>
+{% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var container = document.getElementById('partecipazioni-container');
@@ -139,33 +131,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var btnAggiungi = document.getElementById('aggiungi-partecipante');
     var template = document.getElementById('template-riga-vuota');
 
-    // --- select con ricerca (Choices.js) -----------------------------------
-    // registro delle istanze già inizializzate, per non farlo due volte sullo
-    // stesso <select> (i campi allievo/cavallo hanno data-searchable="true" E
-    // vengono anche processati riga per riga da inizializzaRiga).
-    var istanzeChoices = new WeakMap();
-
-    function inizializzaSearchable(el) {
-        if (istanzeChoices.has(el)) return istanzeChoices.get(el);
-        var istanza = new Choices(el, {
-            searchEnabled: true,
-            itemSelectText: '',
-            shouldSort: false,
-            allowHTML: false,
-            placeholder: true,
-            placeholderValue: '— {% trans "seleziona" %} —',
-        });
-        istanzeChoices.set(el, istanza);
-        return istanza;
-    }
-
+    // Choices.js sui select esistenti è già inizializzato globalmente da
+    // core/base.html; qui serve solo per le righe aggiunte dopo il
+    // caricamento (window.equilesson.inizializzaSearchable, stessa istanza
+    // condivisa, non una copia locale).
     function inizializzaRiga(riga) {
-        riga.querySelectorAll('select[data-searchable="true"]').forEach(inizializzaSearchable);
+        riga.querySelectorAll('select[data-searchable="true"]').forEach(window.equilesson.inizializzaSearchable);
     }
-
-    // idempotente: inizializzaSearchable salta chi è già in istanzeChoices
-    document.querySelectorAll('select[data-searchable="true"]').forEach(inizializzaSearchable);
-    document.querySelectorAll('.partecipazione-row').forEach(inizializzaRiga);
 
     // --- aggiunta dinamica di righe partecipante ----------------------------
     btnAggiungi.addEventListener('click', function () {

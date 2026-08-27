@@ -376,6 +376,129 @@ msgstr "Language"
 msgid "QR della tessera"
 msgstr "Membership card QR code"
 
+msgid "Gestione"
+msgstr "Manage"
+
+msgid "Amministrazione tecnica"
+msgstr "Technical admin"
+
+msgid "Nuovo"
+msgstr "New"
+
+msgid "Modifica"
+msgstr "Edit"
+
+msgid "Elimina"
+msgstr "Delete"
+
+msgid "Cerca…"
+msgstr "Search…"
+
+msgid "Nessun risultato."
+msgstr "No results."
+
+msgid "Salva"
+msgstr "Save"
+
+msgid "Eliminare \"%(elemento)s\"?"
+msgstr "Delete \"%(elemento)s\"?"
+
+msgid "%(voce)s salvato correttamente."
+msgstr "%(voce)s saved successfully."
+
+msgid "%(voce)s eliminato."
+msgstr "%(voce)s deleted."
+
+msgid "Allievi"
+msgstr "Students"
+
+msgid "allievo"
+msgstr "student"
+
+msgid "Persone"
+msgstr "People"
+
+msgid "Nome"
+msgstr "First name"
+
+msgid "Cognome"
+msgstr "Last name"
+
+msgid "Telefono"
+msgstr "Phone"
+
+msgid "Scadenza certificato"
+msgstr "Certificate due date"
+
+msgid "Tutori"
+msgstr "Guardians"
+
+msgid "tutore"
+msgstr "guardian"
+
+msgid "Istruttori"
+msgstr "Instructors"
+
+msgid "istruttore"
+msgstr "instructor"
+
+msgid "Attivo"
+msgstr "Active"
+
+msgid "Proprietari"
+msgstr "Owners"
+
+msgid "proprietario"
+msgstr "owner"
+
+msgid "cavallo"
+msgstr "horse"
+
+msgid "Livello"
+msgstr "Level"
+
+msgid "Disponibile"
+msgstr "Available"
+
+msgid "Pacchetti"
+msgstr "Packages"
+
+msgid "pacchetto"
+msgstr "package"
+
+msgid "Residue"
+msgstr "Remaining"
+
+msgid "Tipi di pacchetto"
+msgstr "Package types"
+
+msgid "tipo di pacchetto"
+msgstr "package type"
+
+msgid "N. lezioni"
+msgstr "No. of lessons"
+
+msgid "Campi"
+msgstr "Arenas"
+
+msgid "campo"
+msgstr "arena"
+
+msgid "Tipi di lezione"
+msgstr "Lesson types"
+
+msgid "tipo di lezione"
+msgstr "lesson type"
+
+msgid "Durata (min)"
+msgstr "Duration (min)"
+
+msgid "Sì"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
 msgid ""
 "Il cavallo ti verrà assegnato dalla segreteria dopo la prenotazione. Puoi "
 "annullare in qualsiasi momento dal tuo"

@@ -24,6 +24,7 @@ urlpatterns = [
     path('lezioni/', include('lezioni.urls')),
     path('persone/', include('persone.urls')),
     path('report/', include('report.urls')),
+    path('comunicazioni/', include('comunicazioni.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
     path('', include('core.urls')),
 ]

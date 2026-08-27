@@ -60,7 +60,9 @@
 <div class="mt-4 d-flex gap-2">
     <a href="{% url 'lezioni:calendario' %}" class="btn btn-primary">{% trans "Calendario lezioni" %}</a>
     <a href="{% url 'report:report' %}" class="btn btn-outline-secondary">{% trans "Report" %}</a>
-    <a href="/admin/" class="btn btn-outline-secondary">{% trans "Vai all'amministrazione" %}</a>
+    {% if user.is_superuser %}
+    <a href="/admin/" class="btn btn-outline-secondary">{% trans "Amministrazione tecnica" %}</a>
+    {% endif %}
 </div>
 
 {% elif user.allievo %}

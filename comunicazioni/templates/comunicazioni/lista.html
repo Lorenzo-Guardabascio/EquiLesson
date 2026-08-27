@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Comunicazioni" %} - {% trans "Gestionale maneggio" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h1 class="h3 mb-0">{% trans "Comunicazioni" %}</h1>
+    {% if puo_inviare %}
+    <a href="{% url 'comunicazioni:nuova' %}" class="btn btn-primary btn-sm">+ {% trans "Nuova comunicazione" %}</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{% trans "Oggetto" %}</th>
+                    <th>{% trans "Inviata il" %}</th>
+                    <th>{% trans "Destinatari" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in comunicazioni %}
+                <tr>
+                    <td>{{ c.oggetto }}</td>
+                    <td>{{ c.inviata_il|date:"d/m/Y H:i"|default:"—" }}</td>
+                    <td>{{ c.destinatari_count }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-muted text-center py-4">{% trans "Nessun risultato." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

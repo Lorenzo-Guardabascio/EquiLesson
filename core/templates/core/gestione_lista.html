@@ -1,0 +1,53 @@
+{% extends "core/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ voce.etichetta }} - {% trans "Gestionale maneggio" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h1 class="h3 mb-0">{{ voce.etichetta }}</h1>
+    {% if puo_aggiungere %}
+    <a href="{% url 'core:gestione_nuovo' slug=voce.slug %}" class="btn btn-primary btn-sm">+ {% trans "Nuovo" %}</a>
+    {% endif %}
+</div>
+
+{% if voce.cerca_campi %}
+<form method="get" class="mb-3" style="max-width: 20rem;">
+    <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="{% trans 'Cerca…' %}">
+</form>
+{% endif %}
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    {% for etichetta, _ in voce.colonne %}
+                    <th>{{ etichetta }}</th>
+                    {% endfor %}
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for riga in righe %}
+                <tr>
+                    {% for valore in riga.valori %}
+                    <td>{{ valore }}</td>
+                    {% endfor %}
+                    <td class="text-end">
+                        {% if puo_scrivere %}
+                        <a href="{% url 'core:gestione_modifica' slug=voce.slug pk=riga.pk %}" class="btn btn-sm btn-outline-secondary">{% trans "Modifica" %}</a>
+                        {% endif %}
+                        {% if puo_eliminare %}
+                        <a href="{% url 'core:gestione_elimina' slug=voce.slug pk=riga.pk %}" class="btn btn-sm btn-outline-danger">{% trans "Elimina" %}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="{{ voce.colonne|length|add:1 }}" class="text-muted text-center py-4">{% trans "Nessun risultato." %}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
