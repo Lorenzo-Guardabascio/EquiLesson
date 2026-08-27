@@ -67,13 +67,17 @@ if not DEBUG:
 INSTALLED_APPS = [
     'admin_interface',
     'colorfield',
+    # 'core' sta qui, prima di 'django.contrib.admin', apposta: solo così i
+    # suoi template in core/templates/admin/ (es. color_theme_toggle.html)
+    # possono sovrascrivere quelli di default dell'admin — il resolver dei
+    # template sceglie il primo match nell'ordine di INSTALLED_APPS.
+    'core',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
     'persone',
     'cavalli',
     'pacchetti',

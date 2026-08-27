@@ -1,0 +1,23 @@
+{% comment %}
+Sovrascrive admin/color_theme_toggle.html di Django per rimuovere del tutto
+il pulsante di cambio tema chiaro/scuro dell'admin.
+
+Il tema scuro di Django (attivato da questo pulsante, non dalla preferenza
+del sistema operativo) imposta data-theme="dark" sull'<html> e usa le
+variabili CSS scure di Django stesse. django-admin-interface neutralizza
+solo il caso "preferenza del sistema operativo" (vedi il blocco
+@media (prefers-color-scheme: dark) nel suo CSS), non questo toggle
+manuale: il risultato è uno sfondo scuro di Django con sopra i colori
+chiari scelti per il tema di EquiLesson, testo su sfondo dello stesso
+tono, illeggibile.
+
+L'admin qui è pensato come pannello tecnico a tema unico (vedi
+core/migrations/0002_tema_admin_equilesson.py), quindi il modo più
+semplice e sicuro è togliere la scorciatoia che rompe il contrasto,
+invece di rincorrere una seconda palette per la modalità scura.
+
+Attenzione se lo si riscrive: un commento Django su una riga sola si fa
+con le graffe e il cancelletto, ma quella forma non regge più righe (il
+testo verrebbe stampato per intero invece che scartato) — da qui la
+scelta del tag a blocco.
+{% endcomment %}
