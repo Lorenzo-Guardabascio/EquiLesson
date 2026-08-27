@@ -1,9 +1,16 @@
+import io
 import secrets
 from datetime import timedelta
 
+import qrcode
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core import signing
+from django.core.signing import BadSignature
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
 from comunicazioni.models import TelegramLink
@@ -13,7 +20,9 @@ from pacchetti.models import Pacchetto
 
 from .consensi_testi import TESTO_FOTO_VIDEO, TESTO_PRIVACY
 from .decorators import allievo_required, proprietario_required
-from .models import ConsensoLog
+from .models import Allievo, ConsensoLog
+
+TESSERA_SALT = "persone.tessera-digitale"
 
 TESTI_CONSENSO = {
     ConsensoLog.Tipo.PRIVACY: TESTO_PRIVACY,
@@ -168,3 +177,50 @@ def portale_proprietario(request):
         "proprietario": proprietario,
         "cavalli": cavalli,
     })
+
+
+def _token_tessera(allievo):
+    return signing.dumps(allievo.pk, salt=TESSERA_SALT)
+
+
+@allievo_required
+def tessera(request):
+    """Tessera digitale con QR: la card si vede nel portale, il QR incorpora
+    l'URL di verifica che apre lo staff (non l'allievo stesso)."""
+    allievo = request.user.allievo
+    url_verifica = request.build_absolute_uri(
+        reverse("persone:verifica_tessera", args=[_token_tessera(allievo)])
+    )
+    return render(request, "persone/tessera.html", {"allievo": allievo, "url_verifica": url_verifica})
+
+
+@allievo_required
+def tessera_qr_immagine(request):
+    """Restituisce il PNG del QR della propria tessera (non quella di un altro:
+    il token si genera qui, dall'allievo collegato alla sessione, non da un
+    parametro scelto dal chiamante)."""
+    allievo = request.user.allievo
+    url_verifica = request.build_absolute_uri(
+        reverse("persone:verifica_tessera", args=[_token_tessera(allievo)])
+    )
+    img = qrcode.make(url_verifica)
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    return HttpResponse(buffer.getvalue(), content_type="image/png")
+
+
+@staff_member_required
+def verifica_tessera(request, token):
+    """Pagina di verifica che apre lo staff scansionando il QR di un allievo.
+
+    Riservata allo staff (non pubblica): mostra solo dati identificativi e di
+    tesseramento, MAI il certificato medico o le note riservate, anche se chi
+    scansiona è autorizzato — non c'è motivo di esporli in questo contesto.
+    """
+    try:
+        allievo_id = signing.loads(token, salt=TESSERA_SALT)
+    except BadSignature:
+        return render(request, "persone/verifica_tessera.html", {"valido": False})
+
+    allievo = get_object_or_404(Allievo, pk=allievo_id)
+    return render(request, "persone/verifica_tessera.html", {"valido": True, "allievo": allievo})

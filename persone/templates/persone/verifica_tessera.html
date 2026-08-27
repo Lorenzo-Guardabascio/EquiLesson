@@ -1,0 +1,39 @@
+{% extends "core/base.html" %}
+
+{% block title %}Verifica tessera - Gestionale maneggio{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">Verifica tessera</h1>
+
+{% if valido %}
+<div class="card shadow-sm" style="max-width: 480px;">
+    <div class="card-body">
+        <h2 class="h5">{{ allievo }}</h2>
+        <span class="badge {% if allievo.stato == 'attivo' %}text-bg-success{% else %}text-bg-secondary{% endif %} mb-3">
+            {{ allievo.get_stato_display }}
+        </span>
+        <dl class="row small mb-0">
+            <dt class="col-sm-5">Tessera FISE</dt>
+            <dd class="col-sm-7">
+                {% if allievo.tessera_fise_numero %}
+                    {{ allievo.tessera_fise_numero }}
+                    {% if allievo.tessera_fise_scadenza %}(scad. {{ allievo.tessera_fise_scadenza|date:"d/m/Y" }}){% endif %}
+                {% else %}<span class="text-muted">—</span>{% endif %}
+            </dd>
+            <dt class="col-sm-5">Tessera FITETREK</dt>
+            <dd class="col-sm-7">
+                {% if allievo.tessera_fitetrek_numero %}
+                    {{ allievo.tessera_fitetrek_numero }}
+                    {% if allievo.tessera_fitetrek_scadenza %}(scad. {{ allievo.tessera_fitetrek_scadenza|date:"d/m/Y" }}){% endif %}
+                {% else %}<span class="text-muted">—</span>{% endif %}
+            </dd>
+        </dl>
+    </div>
+</div>
+<p class="text-muted small mt-3">
+    Per motivi di riservatezza questa pagina non mostra certificato medico o note: per quei dati consulta la scheda completa in amministrazione.
+</p>
+{% else %}
+<div class="alert alert-danger" style="max-width: 480px;">Codice non valido.</div>
+{% endif %}
+{% endblock %}

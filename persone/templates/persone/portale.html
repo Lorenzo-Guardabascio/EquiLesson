@@ -5,9 +5,12 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
     <h1 class="h3 mb-0">Ciao, {{ allievo.nome }}</h1>
-    {% if prenotazione_autonoma_abilitata %}
-    <a href="{% url 'lezioni:prenota' %}" class="btn btn-primary btn-sm">+ Prenota una lezione</a>
-    {% endif %}
+    <div class="d-flex gap-2">
+        <a href="{% url 'persone:tessera' %}" class="btn btn-outline-secondary btn-sm">La mia tessera</a>
+        {% if prenotazione_autonoma_abilitata %}
+        <a href="{% url 'lezioni:prenota' %}" class="btn btn-primary btn-sm">+ Prenota una lezione</a>
+        {% endif %}
+    </div>
 </div>
 
 {% if scadenze %}
